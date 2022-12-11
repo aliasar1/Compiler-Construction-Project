@@ -25,7 +25,7 @@ public class LexicalAnalyzer {
 
     private ArrayList<Token> symbolTable = new ArrayList<>();
 
-    public  LexicalAnalyzer(String sourceCode){
+    public LexicalAnalyzer(String sourceCode) throws IOException {
         initializeReserveKeywords();
         this.sourceCode = sourceCode;
         Reader code = new StringReader(sourceCode);
@@ -34,7 +34,7 @@ public class LexicalAnalyzer {
         generateTokens();
     }
 
-    private void initializeReserveKeywords(){
+    private void initializeReserveKeywords() {
         tokenName.add("INT");
         tokenName.add("CHAR");
         tokenName.add("STRING");
@@ -42,21 +42,21 @@ public class LexicalAnalyzer {
         tokenName.add("ELSE");
         tokenName.add("DO");
         tokenName.add("WHILE");
-        for (int i = 0; i<tokenName.size(); i++){
+        for (int i = 0; i < tokenName.size(); i++) {
             Token token = new Token(startAttribute, tokenName.get(i), "-", "-", lineNumber);
             symbolTable.add(token);
             startAttribute++;
         }
     }
 
-    private int getLineNumber(){
-        if(character == '\n')
+    private int getLineNumber() {
+        if (character == '\n')
             return lineNumber++;
-        return  lineNumber;
+        return lineNumber;
     }
 
-    public void printTable(){
-        for (int i = 0; i<symbolTable.size(); i++){
+    public void printTable() {
+        for (int i = 0; i < symbolTable.size(); i++) {
             System.out.println(symbolTable.get(i).toString());
         }
     }
