@@ -1,15 +1,11 @@
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LexicalAnalyzer {
 
-    //  int, char, string, if, else, do, while
-    private String sourceCode;
-    private String identifierRegex = "^[a-zA-Z][a-zA-Z|\\d]*";
+    private final String identifierRegex = "^[a-zA-Z][a-zA-Z|\\d]*";
     Pattern p = Pattern.compile(identifierRegex);
 
     BufferedReader reader;
@@ -19,15 +15,16 @@ public class LexicalAnalyzer {
     char character;
     int count = 0;
     int lineNumber = 1;
-    int counter = 6;
 
-    private ArrayList<String> tokenName = new ArrayList<String>();
+    private final ArrayList<String> tokenName = new ArrayList<String>();
+    private final ArrayList<Token> tokens = new ArrayList<>();
 
-    private ArrayList<Token> symbolTable = new ArrayList<>();
+
+    private final ArrayList<Token> symbolTable = new ArrayList<>();
 
     public LexicalAnalyzer(String sourceCode) throws IOException {
         initializeReserveKeywords();
-        this.sourceCode = sourceCode;
+        //  int, char, string, if, else, do, while
         Reader code = new StringReader(sourceCode);
         reader = new BufferedReader(code);
         character = readNextCharacter();
@@ -49,30 +46,51 @@ public class LexicalAnalyzer {
         }
     }
 
-    private int getLineNumber() {
-        if (character == '\n')
-            return lineNumber++;
-        return lineNumber;
-    }
-
     public void printTable() {
         for (int i = 0; i < symbolTable.size(); i++) {
             System.out.println(symbolTable.get(i).toString());
         }
     }
 
-    public void generateTokens() throws IOException {
+    public void generateTokens() {
         Token token = readNextToken();
         while (token != null) {
-            symbolTable.add(token);
+            if (Objects.equals(token.tokenName, "ID") || Objects.equals(token.tokenName, "IV") || Objects.equals(token.tokenName, "SL")) {
+                if (!checkTokenName(token.tokenName) || checkValue(token.value)) {
+                    symbolTable.add(token);
+                }
+            }
+            character = readNextCharacter();
+            tokens.add(token);
+            // TODO
+            // check for duplicate IDS and int value
+            // meaningful errors triggers
             token = readNextToken();
         }
+    }
+
+    private boolean checkValue(String value) {
+        for (int i = 0; i < symbolTable.size(); i++) {
+            if (Objects.equals(symbolTable.get(i).value, value)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkTokenName(String tokenName) {
+        for (int i = 0; i < symbolTable.size(); i++) {
+            if (Objects.equals(symbolTable.get(i).tokenName, tokenName)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public Token readNextToken() {
         int state = 0;
         while (true) {
-            if (character == (char) -1) {
+            if (character == '$') {
                 try {
                     reader.close();
                 } catch (IOException e) {
@@ -81,10 +99,11 @@ public class LexicalAnalyzer {
                 return null;
             }
             if (character == '\n') {
-                count++;
+                character = readNextCharacter();
+                lineNumber++;
             }
             switch (state) {
-                case 0: {
+                case 0 -> {
                     if (character == 'd') {
                         state = 48;
                     } else if (character == 'c') {
@@ -94,12 +113,7 @@ public class LexicalAnalyzer {
                     } else if (character == 'i') {
                         state = 20;
                     } else if (character == '=') {
-                        character = readNextCharacter();
-                        if (character == '=') {
-                            state = 5;
-                        } else {
-                            state = 14;
-                        }
+                        state = 4;
                     } else if (character == 's') {
                         state = 31;
                     } else if (character == 'e') {
@@ -126,16 +140,21 @@ public class LexicalAnalyzer {
                         state = 18;
                     } else if (character == ';') {
                         state = 19;
-                    } else if (character == ' ') {
+                    } else if (character == '"'){
+                        state = 61;
+                    }
+                    else if (character == ' ' || character == '\n' || character == '\t' ||
+                            character == '\f' || character == '\b' || character == '\r') {
                         character = readNextCharacter();
                     } else if (isAlphabet(character)) {
                         state = 59;
+                    } else if (isDigit(character)) {
+                        state = 60;
                     } else {
                         fail();
                     }
-                    break;
                 }
-                case 1: {
+                case 1 -> {
                     if (character == '>') {
                         state = 6;
                     } else if (character == '=') {
@@ -143,390 +162,336 @@ public class LexicalAnalyzer {
                     } else {
                         state = 3;
                     }
-                    break;
                 }
-                case 2: {
-                    Token token = new Token(startAttribute, "ROP", "GE", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 2 -> {
+                    return new Token(startAttribute, "ROP", "GE", "-", lineNumber);
                 }
-                case 3: {
-                    Token token = new Token(startAttribute, "ROP", "LT", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 3 -> {
+                    return new Token(startAttribute, "ROP", "LT", "-", lineNumber);
                 }
-                case 4: {
+                case 4 -> {
+                    character = readNextCharacter();
                     if (character == '=') {
                         state = 5;
+                    } else {
+                        state = 14;
                     }
-                    break;
                 }
-                case 5: {
-                    Token token = new Token(startAttribute, "ROP", "EQ", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 5 -> {
+                    return new Token(startAttribute, "ROP", "EQ", "-", lineNumber);
                 }
-                case 6: {
-                    Token token = new Token(startAttribute, "ROP", "NE", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 6 -> {
+                    return new Token(startAttribute, "ROP", "NE", "-", lineNumber);
                 }
-                case 7: {
+                case 7 -> {
                     character = readNextCharacter();
                     if (character == '=') {
                         state = 8;
                     } else {
                         state = 9;
                     }
-                    break;
                 }
-                case 8: {
-                    Token token = new Token(startAttribute, "ROP", "LE", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 8 -> {
+                    return new Token(startAttribute, "ROP", "LE", "-", lineNumber);
                 }
-                case 9: {
-                    Token token = new Token(startAttribute, "ROP", "GT", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 9 -> {
+                    return new Token(startAttribute, "ROP", "GT", "-", lineNumber);
                 }
-                case 10: {
-                    Token token = new Token(startAttribute, "AOP", "AD", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 10 -> {
+                    return new Token(startAttribute, "AOP", "AD", "-", lineNumber);
                 }
-                case 11: {
-                    Token token = new Token(startAttribute, "AOP", "SB", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 11 -> {
+                    return new Token(startAttribute, "AOP", "SB", "-", lineNumber);
                 }
-                case 12: {
-                    Token token = new Token(startAttribute, "AOP", "ML", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 12 -> {
+                    return new Token(startAttribute, "AOP", "ML", "-", lineNumber);
                 }
-                case 13: {
-                    Token token = new Token(startAttribute, "AOP", "DV", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 13 -> {
+                    character = readNextCharacter();
+                    if (character == '/') {
+                        character = readNextCharacter();
+                        while (character != '\n') {
+                            character = readNextCharacter();
+                        }
+                        character = readNextCharacter();
+                        lineNumber++;
+                        state = 0;
+                    } else if (character == '*') {
+                        character = readNextCharacter();
+                        while (character != '*' && (character = readNextCharacter()) != '/') {
+                            character = readNextCharacter();
+                        }
+                        do {
+                            character = readNextCharacter();
+                        } while (character != '\n');
+                        {
+                            character = readNextCharacter();
+                        }
+                        count++;
+                    }else{
+                        return new Token(startAttribute, "AOP", "DV", "-", lineNumber);
+                    }
                 }
-                case 14: {
-                    Token token = new Token(startAttribute, "OOP", "EQ", "-", lineNumber);
-                    startAttribute++;
-                    return  token;
+                case 14 -> {
+                    return new Token(startAttribute, "OOP", "EQ", "-", lineNumber);
                 }
-                case 15: {
-                    Token token = new Token(startAttribute, "OOP", "OP", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 15 -> {
+                    return new Token(startAttribute, "OOP", "OP", "-", lineNumber);
                 }
-                case 16: {
-                    Token token = new Token(startAttribute, "OOP", "CP", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 16 -> {
+                    return new Token(startAttribute, "OOP", "CP", "-", lineNumber);
                 }
-                case 17: {
-                    Token token = new Token(startAttribute, "OOP", "OB", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 17 -> {
+                    return new Token(startAttribute, "OOP", "OB", "-", lineNumber);
                 }
-                case 18: {
-                    Token token = new Token(startAttribute, "OOP", "CB", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 18 -> {
+                    return new Token(startAttribute, "OOP", "CB", "-", lineNumber);
                 }
-                case 19: {
-                    Token token = new Token(startAttribute, "OOP", "TR", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 19 -> {
+                    character = readNextCharacter();
+                    return new Token(startAttribute, "OOP", "TR", "-", lineNumber);
                 }
-                case 20: {
+                case 20 -> {
                     character = readNextCharacter();
                     if (character == 'n') {
                         state = 21;
                     } else if (character == 'f') {
                         state = 39;
                     } else {
-                        checkIdentifiers("i");
+                        return checkIdentifiers("i");
                     }
-                    break;
                 }
-                case 21:{
+                case 21 -> {
                     character = readNextCharacter();
                     if (character == 't') {
                         state = 22;
                     } else {
-                        checkIdentifiers("in");
+                        return checkIdentifiers("in");
                     }
-                    break;
                 }
-                case 22: {
+                case 22 -> {
                     character = readNextCharacter();
                     if (character == ' ') {
                         state = 23;
                     } else {
                         state = 24;
                     }
-                    break;
                 }
-                case 23: {
-                    Token token = new Token(startAttribute, "INT", "-", "-", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 23 -> {
+                    return new Token(startAttribute, "INT", "-", "-", lineNumber);
                 }
-                case 24: {
-                    checkIdentifiers("int" + character);
-                    break;
+                case 24 -> {
+                    return checkIdentifiers("int" + character);
                 }
-                case 25: {
+                case 25 -> {
                     character = readNextCharacter();
                     if (character == 'h') {
                         state = 26;
                     } else {
-                        checkIdentifiers("c");
+                        return checkIdentifiers("c");
                     }
-                    break;
                 }
-                case 26: {
+                case 26 -> {
                     character = readNextCharacter();
                     if (character == 'a') {
                         state = 27;
                     } else {
-                        checkIdentifiers("ch");
+                        return checkIdentifiers("ch");
                     }
-                    break;
                 }
-                case 27: {
+                case 27 -> {
                     character = readNextCharacter();
                     if (character == 'r') {
                         state = 28;
                     } else {
-                        checkIdentifiers("cha");
+                        return checkIdentifiers("cha");
                     }
-                    break;
                 }
-                case 28: {
+                case 28 -> {
                     character = readNextCharacter();
                     if (character == ' ') {
                         state = 29;
                     } else {
                         state = 30;
                     }
-                    break;
                 }
-                case 29: {
-                    Token token = new Token(startAttribute, "CHAR", "", "", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 29 -> {
+                    return new Token(startAttribute, "CHAR", "", "", lineNumber);
                 }
-
-                case 30: {
-                    checkIdentifiers("char" + character);
-                    break;
+                case 30 -> {
+                    return checkIdentifiers("char" + character);
                 }
-                case 31: {
+                case 31 -> {
                     character = readNextCharacter();
                     if (character == 't') {
                         state = 32;
                     } else {
-                        checkIdentifiers("s");
+                        return checkIdentifiers("s");
                     }
-                    break;
                 }
-                case 32: {
+                case 32 -> {
                     character = readNextCharacter();
                     if (character == 'r') {
                         state = 33;
                     } else
-                        checkIdentifiers("st");
-                    break;
+                        return checkIdentifiers("st");
                 }
-                case 33: {
+                case 33 -> {
                     character = readNextCharacter();
                     if (character == 'i') {
                         state = 34;
                     } else
-                        checkIdentifiers("str");
-                    break;
+                        return checkIdentifiers("str");
                 }
-                case 34: {
+                case 34 -> {
                     character = readNextCharacter();
                     if (character == 'n') {
                         state = 35;
                     } else {
-                        checkIdentifiers("stri");
+                        return checkIdentifiers("stri");
                     }
-                    break;
                 }
-                case 35: {
+                case 35 -> {
                     character = readNextCharacter();
                     if (character == 'g') {
                         state = 36;
                     } else {
-                        checkIdentifiers("strin");
+                        return checkIdentifiers("strin");
                     }
-                    break;
                 }
-                case 36:{
+                case 36 -> {
                     character = readNextCharacter();
                     if (character == ' ') {
                         state = 37;
                     } else {
                         state = 38;
                     }
-                    break;
                 }
-                case 37: {
-                    Token token = new Token(startAttribute, "STRING", "", "", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 37 -> {
+                    return new Token(startAttribute, "STRING", "", "", lineNumber);
                 }
-                case 38: {
-                    checkIdentifiers("string" + character);
-                    break;
+                case 38 -> {
+                    return checkIdentifiers("string" + character);
                 }
-                case 39: {
+                case 39 -> {
                     character = readNextCharacter();
                     if (character == ' ') {
                         state = 40;
                     } else
                         state = 41;
-                    break;
                 }
-                case 40: {
-                    Token token = new Token(startAttribute, "IF", "", "", lineNumber);
-                    startAttribute++;
-                    return token;
+                case 40 -> {
+                    return new Token(startAttribute, "IF", "-", "-", lineNumber);
                 }
-                case 41: {
-                    checkIdentifiers("if" + character);
-                    break;
+                case 41 -> {
+                    return checkIdentifiers("if" + character);
                 }
-                case 42: {
+                case 42 -> {
                     character = readNextCharacter();
                     if (character == 'l')
                         state = 43;
                     else
-                        checkIdentifiers("e");
-                    break;
+                        return checkIdentifiers("e");
                 }
-                case 43: {
+                case 43 -> {
                     character = readNextCharacter();
                     if (character == 's')
                         state = 44;
                     else
-                        checkIdentifiers("el");
-                    break;
+                        return checkIdentifiers("el");
                 }
-                case 44: {
+                case 44 -> {
                     character = readNextCharacter();
                     if (character == 'e')
                         state = 45;
                     else
-                        checkIdentifiers("els");
-                    break;
+                        return checkIdentifiers("els");
                 }
-                case 45: {
+                case 45 -> {
                     character = readNextCharacter();
                     if (character == ' ')
                         state = 46;
                     else
                         state = 47;
-                    break;
                 }
-                case 46: {
-                    Token token = new Token(startAttribute++, "ELSE", "", "", lineNumber);
-                    return token;
+                case 46 -> {
+                    return new Token(startAttribute, "ELSE", "", "", lineNumber);
                 }
-                case 47: {
-                    checkIdentifiers("else" + character);
-                    break;
+                case 47 -> {
+                    return checkIdentifiers("else" + character);
                 }
-                case 48: {
+                case 48 -> {
                     character = readNextCharacter();
                     if (character == 'O') {
                         state = 49;
                     } else {
-                        checkIdentifiers("D");
+                        return checkIdentifiers("D");
                     }
-                    break;
                 }
-                case 49: {
+                case 49 -> {
                     character = readNextCharacter();
                     if (character == ' ') {
                         state = 50;
                     } else {
                         state = 51;
                     }
-                    break;
                 }
-                case 50: {
-                    Token token = new Token(startAttribute++, "DO", "-", "", lineNumber);
-                    return token;
+                case 50 -> {
+                    return new Token(startAttribute, "DO", "-", "", lineNumber);
                 }
-                case 51: {
-                    checkIdentifiers("do" + character);
-                    break;
+                case 51 -> {
+                    return checkIdentifiers("do" + character);
                 }
-                case 52: {
+                case 52 -> {
                     character = readNextCharacter();
                     if (character == 'h') {
                         state = 53;
                     } else {
-                        checkIdentifiers("w");
+                        return checkIdentifiers("w");
                     }
-                    break;
                 }
-                case 53: {
+                case 53 -> {
                     character = readNextCharacter();
                     if (character == 'i') {
                         state = 54;
                     } else {
-                        checkIdentifiers("wh");
+                        return checkIdentifiers("wh");
                     }
-                    break;
                 }
-
-                case 54: {
+                case 54 -> {
                     character = readNextCharacter();
                     if (character == 'l') {
                         state = 55;
                     } else {
-                        checkIdentifiers("whi");
+                        return checkIdentifiers("whi");
                     }
-                    break;
                 }
-                case 55: {
+                case 55 -> {
                     character = readNextCharacter();
                     if (character == 'e') {
                         state = 56;
                     } else {
-                        checkIdentifiers("whil");
+                        return checkIdentifiers("whil");
                     }
-                    break;
                 }
-                case 56: {
+                case 56 -> {
                     character = readNextCharacter();
                     if (character == ' ') {
                         state = 57;
                     } else {
                         state = 58;
                     }
-                    break;
                 }
-                case 57: {
-                    Token token = new Token(startAttribute++, "WHILE", "", "-", lineNumber);
-                    return token;
+                case 57 -> {
+                    return new Token(startAttribute, "WHILE", "", "-", lineNumber);
                 }
-                case 58: {
-                    checkIdentifiers("while" + character);
-                    break;
+                case 58 -> {
+                    return checkIdentifiers("while" + character);
                 }
-                case 59: {
-                    checkIdentifiers(String.valueOf(character));
-                    break;
+                case 59 -> {
+                    return checkIdentifiers(String.valueOf(character));
                 }
-                case 60: {
+                case 60 -> {
                     if (isDigit(character)) {
                         StringBuilder word = new StringBuilder(String.valueOf(character));
                         while (true) {
@@ -534,31 +499,34 @@ public class LexicalAnalyzer {
                             if (isDigit(character)) {
                                 word.append(character);
                             } else {
-                                if (!checkValue(String.valueOf(word))) {
-                                    Token token = new Token(startAttribute++, "IV", "-", String.valueOf(word), lineNumber);
-                                    symbolTable.add(token);
-                                    return token;
+                                if (checkTokenName(String.valueOf(word))) {
+                                    return new Token(startAttribute++, "IV", "-", String.valueOf(word), lineNumber);
                                 }
                                 break;
                             }
                         }
                     }
                 }
-                default:
-                    fail();
-                    break;
+                case 61 -> {
+                    character = readNextCharacter();
+                    StringBuilder builder = new StringBuilder();
+                    while (character != '"'){
+                        builder.append(character);
+                        character = readNextCharacter();
+                    }
+                    return new Token(startAttribute++, "SL", "-", String.valueOf(builder), lineNumber);
+                }
+                default -> fail();
             }
         }
 
     }
-
     char readNextCharacter() {
         try {
             return (char) reader.read();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        getLineNumber();
         return (char) -1;
     }
 
@@ -569,10 +537,8 @@ public class LexicalAnalyzer {
             if (isAlphabet(character) || isDigit(character)) {
                 word.append(character);
             } else {
-                if (!checkValue(String.valueOf(word))) {
-                    Token token = new Token(startAttribute, "ID", "-", String.valueOf(word), lineNumber);
-                    symbolTable.add(token);
-                    return token;
+                if (checkTokenName(String.valueOf(word))) {
+                    return new Token(startAttribute++, "ID", "-", String.valueOf(word), lineNumber);
                 }
                 break;
             }
@@ -584,29 +550,14 @@ public class LexicalAnalyzer {
 
     }
 
-    private boolean checkValue(String value) {
-        for (int i = 0; i < symbolTable.size(); i++) {
-            if (Objects.equals(symbolTable.get(i).value, value)) {
-                return true;
-            }
-        }
-        return false;
+    boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
     }
 
-    boolean isDigit(char c) {       //Check if current character is a Digit or not
-        if (c >= '0' && c <= '9' || c == '.')
-            return true;
-
-        return false;
-    }
-
-    boolean isAlphabet(char c) {       //Check if current character is a Alphabet or not
+    boolean isAlphabet(char c) {
         if (c >= 'a' && c <= 'z')
             return true;
-        if (c >= 'A' && c <= 'Z')
-            return true;
-
-        return false;
+        return c >= 'A' && c <= 'Z';
     }
 
 }
