@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -17,7 +18,7 @@ public class LexicalAnalyzer {
     int lineNumber = 1;
 
     private final ArrayList<String> tokenName = new ArrayList<String>();
-    private final ArrayList<Token> tokens = new ArrayList<>();
+    public final ArrayList<Token> tokens = new ArrayList<>();
 
 
     private final ArrayList<Token> symbolTable = new ArrayList<>();
@@ -51,12 +52,18 @@ public class LexicalAnalyzer {
             System.out.println(symbolTable.get(i).toString());
         }
     }
+    public void printLexTable() {
+        for (int i = 0; i < tokens.size(); i++) {
+            System.out.println(tokens.get(i).toString());
+        }
+    }
 
     public void generateTokens() {
         Token token = readNextToken();
         while (token != null) {
             if (Objects.equals(token.tokenName, "ID") || Objects.equals(token.tokenName, "IV") || Objects.equals(token.tokenName, "SL")) {
-                if (!checkTokenName(token.tokenName) || checkValue(token.value)) {
+                if (checkTokenName(token.tokenName) || checkValue(token.value)) {
+
                     symbolTable.add(token);
                 }
             }
@@ -81,6 +88,7 @@ public class LexicalAnalyzer {
     private boolean checkTokenName(String tokenName) {
         for (int i = 0; i < symbolTable.size(); i++) {
             if (Objects.equals(symbolTable.get(i).tokenName, tokenName)) {
+//                System.out.print("error at line :"+Objects.toString(tokens.get(4)));
                 return false;
             }
         }
@@ -140,10 +148,9 @@ public class LexicalAnalyzer {
                         state = 18;
                     } else if (character == ';') {
                         state = 19;
-                    } else if (character == '"'){
+                    } else if (character == '"') {
                         state = 61;
-                    }
-                    else if (character == ' ' || character == '\n' || character == '\t' ||
+                    } else if (character == ' ' || character == '\n' || character == '\t' ||
                             character == '\f' || character == '\b' || character == '\r') {
                         character = readNextCharacter();
                     } else if (isAlphabet(character)) {
@@ -228,7 +235,7 @@ public class LexicalAnalyzer {
                             character = readNextCharacter();
                         }
                         count++;
-                    }else{
+                    } else {
                         return new Token(startAttribute, "AOP", "DV", "-", lineNumber);
                     }
                 }
@@ -500,7 +507,7 @@ public class LexicalAnalyzer {
                                 word.append(character);
                             } else {
                                 if (checkTokenName(String.valueOf(word))) {
-                                    return new Token(startAttribute++, "IV", "-", String.valueOf(word), lineNumber);
+                                    return new Token(startAttribute, "IV", String.valueOf(word), "-", lineNumber);
                                 }
                                 break;
                             }
@@ -509,18 +516,19 @@ public class LexicalAnalyzer {
                 }
                 case 61 -> {
                     character = readNextCharacter();
-                    StringBuilder builder = new StringBuilder();
-                    while (character != '"'){
-                        builder.append(character);
+                    StringBuilder word = new StringBuilder();
+                    while (character != '"') {
+                        word.append(character);
                         character = readNextCharacter();
                     }
-                    return new Token(startAttribute++, "SL", "-", String.valueOf(builder), lineNumber);
+                    return new Token(startAttribute++, "SL", String.valueOf(word), "-", lineNumber);
                 }
                 default -> fail();
             }
         }
 
     }
+
     char readNextCharacter() {
         try {
             return (char) reader.read();
@@ -538,7 +546,7 @@ public class LexicalAnalyzer {
                 word.append(character);
             } else {
                 if (checkTokenName(String.valueOf(word))) {
-                    return new Token(startAttribute++, "ID", "-", String.valueOf(word), lineNumber);
+                    return new Token(startAttribute++, "ID", String.valueOf(word), "-", lineNumber);
                 }
                 break;
             }

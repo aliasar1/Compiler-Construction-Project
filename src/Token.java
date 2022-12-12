@@ -6,7 +6,7 @@ public class Token {
     String value;
     int lineNumber;
 
-    public Token(int attributeValue, String tokenName, String type, String value, int line){
+    public Token(int attributeValue, String tokenName, String value, String type, int line){
         this.attributeValue = attributeValue;
         this.tokenName = tokenName;
         this.type = type;
@@ -16,6 +16,6 @@ public class Token {
 
     @Override
     public String toString() {
-        return this.attributeValue + "  " + this.tokenName + "  " + this.type + "  " + this.value;
+        return this.attributeValue + "  " + this.tokenName + "  " + this.value + "  " + this.type;
     }
 }
