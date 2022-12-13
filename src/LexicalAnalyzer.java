@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 
 public class LexicalAnalyzer {
 
-    private final String identifierRegex = "^[a-zA-Z][a-zA-Z|\\d]*";
-    Pattern p = Pattern.compile(identifierRegex);
+//    private final String identifierRegex = "^[a-zA-Z][a-zA-Z|\\d]*";
+//    Pattern p = Pattern.compile(identifierRegex);
 
     BufferedReader reader;
 
@@ -26,7 +26,6 @@ public class LexicalAnalyzer {
 
     public LexicalAnalyzer(String sourceCode) throws IOException {
         initializeReserveKeywords();
-        //  int, char, string, if, else, do, while
         Reader code = new StringReader(sourceCode);
         reader = new BufferedReader(code);
         character = readNextCharacter();
@@ -77,12 +76,24 @@ public class LexicalAnalyzer {
                     symbolTable.add(token);
                 }
             }
-            tokens.add(token);
-            // TODO
-            // check for duplicate IDS and int value
-            // meaningful errors triggers
+            int a = getExistingAttribute(token);
+            if(a != -1){
+                token.attributeValue = a;
+                tokens.add(token);
+            }
+            else
+                tokens.add(token);
             token = readNextToken();
         }
+    }
+
+    private int getExistingAttribute(Token token){
+        for (int i=0; i<symbolTable.size(); i++){
+            if ((Objects.equals(symbolTable.get(i).tokenName, token.tokenName)) && (Objects.equals(symbolTable.get(i).value, token.value))){
+                return symbolTable.get(i).attributeValue;
+            }
+        }
+        return -1;
     }
 
     private boolean checkValue(String value) {
