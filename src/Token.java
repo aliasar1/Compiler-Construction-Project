@@ -1,13 +1,15 @@
 public class Token {
 
-    int attributeValue;
+    String attributeValue;
+    String lexeme;
     String tokenName;
     String type;
     String value;
     int lineNumber;
 
-    public Token(int attributeValue, String tokenName, String value, String type, int line){
+    public Token(String attributeValue, String lexeme, String tokenName, String value, String type, int line){
         this.attributeValue = attributeValue;
+        this.lexeme = lexeme;
         this.tokenName = tokenName;
         this.type = type;
         this.value = value;
