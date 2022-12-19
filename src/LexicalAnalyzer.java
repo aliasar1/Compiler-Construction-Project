@@ -12,6 +12,7 @@ public class LexicalAnalyzer {
     BufferedReader reader;
     public final ArrayList<Token> tokens = new ArrayList<>();
     private final ArrayList<Token> symbolTable = new ArrayList<>();
+    private final  ArrayList<Errors> errorsList = new ArrayList<>();
 
     public LexicalAnalyzer(String sourceCode) {
         initializeReserveKeywords();
@@ -52,6 +53,20 @@ public class LexicalAnalyzer {
         Formatter fmt = new Formatter();
         for (Token token : tokens) {
             fmt.format("%14s  %20s  %14s  %28s\n", token.lexeme, token.tokenName, token.attributeValue, " on line " + token.lineNumber);
+        }
+        System.out.println(fmt);
+        System.out.println("-----------------------------------------------------------------------------------------");
+    }
+
+    public void errorTable() {
+        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println("\t\t\t\t\t\t\t\t\t\tERRORS");
+        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println("\t\tLexemes\t\t\t\tError Type\t\t\tDescription\t\t\tLine Number");
+        System.out.println("-----------------------------------------------------------------------------------------");
+        Formatter fmt = new Formatter();
+        for (Errors error : errorsList) {
+            fmt.format("%14s  %20s  %30s  %10s\n", error.lexeme, error.errorType, error.errorMessage, " on line " + error.lineNumber);
         }
         System.out.println(fmt);
         System.out.println("-----------------------------------------------------------------------------------------");
@@ -108,7 +123,7 @@ public class LexicalAnalyzer {
     public Token readNextToken() {
         int state = 0;
         while (true) {
-            if (character == '$') {
+            if (character == (char) -1) {
                 try {
                     reader.close();
                 } catch (IOException e) {
@@ -167,8 +182,9 @@ public class LexicalAnalyzer {
                         state = 59;
                     } else if (isDigit(character)) {
                         state = 60;
-                    } else {
-                        fail();
+                    }
+                    else {
+                        callErrorRoutine();
                     }
                 }
                 case 1 -> {
@@ -287,6 +303,7 @@ public class LexicalAnalyzer {
                 case 19 -> {
                     character = readNextCharacter();
                     return new Token("TR", ";","OOP", "TR", "-", lineNumber);
+
                 }
                 case 20 -> {
                     character = readNextCharacter();
@@ -409,7 +426,7 @@ public class LexicalAnalyzer {
                 }
                 case 37 -> {
                     character = readNextCharacter();
-                    return new Token(String.valueOf(startAttribute),"String","STRING", "-", "", lineNumber);
+                    return new Token(String.valueOf(startAttribute),"string","STRING", "-", "", lineNumber);
                 }
                 case 38 -> {
                     return checkIdentifiers("string" + character);
@@ -560,13 +577,14 @@ public class LexicalAnalyzer {
                     character = readNextCharacter();
                     return new Token(String.valueOf(startAttribute), String.valueOf(word), "SL",String.valueOf(word),"-" , lineNumber);
                 }
-                default -> fail();
+                default -> callErrorRoutine();
             }
         }
-
     }
 
-    char readNextCharacter() {
+    private void callErrorRoutine(){}
+
+    private char readNextCharacter() {
         try {
             return (char) reader.read();
         } catch (IOException e) {
@@ -575,13 +593,31 @@ public class LexicalAnalyzer {
         return (char) -1;
     }
 
+    private void checkIllegalCharacter(String s){
+        StringBuilder word = new StringBuilder(s);
+        while (true){
+            character = readNextCharacter();
+            if (character == ' ' || character == '/'){
+                word.append(character);
+            }
+            else {
+
+            }
+        }
+    }
+
     private Token checkIdentifiers(String s) {
         StringBuilder word = new StringBuilder(s);
         while (true) {
             character = readNextCharacter();
             if (isAlphabet(character) || isDigit(character)) {
                 word.append(character);
-            } else {
+            }
+//            else if (!isAlphabet(character) || !isDigit(character)){
+//                errorsList.add(new Errors(lineNumber, "Identifier Error", "Identifier cannot have special characters.", String.valueOf(word)));
+//                return null;
+//            }
+            else {
                 if (checkTokenName(String.valueOf(word))) {
                     return new Token(String.valueOf(startAttribute),String.valueOf(word), "ID", String.valueOf(word), "-", lineNumber);
                 }
@@ -589,10 +625,6 @@ public class LexicalAnalyzer {
             }
         }
         return null;
-    }
-
-    private void fail() {
-
     }
 
     boolean isDigit(char c) {

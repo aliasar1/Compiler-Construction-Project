@@ -1,8 +1,6 @@
-import java.io.IOException;
-
 public class Main {
     public static void main(String[] args) {
-        // MyFrame frame = new MyFrame();
+//         MyFrame frame = new MyFrame();
         String sc = """
                 int val1 = 21; // to store a value
                 int val2;
@@ -17,9 +15,13 @@ public class Main {
                 }
                 total = (val1 + val2) * val1;
                 """;
-        sc = sc+'$';
+//        String sc = """
+////                int val2;
+//                int total;
+//                """;
         LexicalAnalyzer lex = new LexicalAnalyzer(sc);
         lex.printLexTable();
         lex.printTable();
+        lex.errorTable();
     }
 }
