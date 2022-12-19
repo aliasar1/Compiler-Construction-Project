@@ -593,19 +593,6 @@ public class LexicalAnalyzer {
         return (char) -1;
     }
 
-    private void checkIllegalCharacter(String s){
-        StringBuilder word = new StringBuilder(s);
-        while (true){
-            character = readNextCharacter();
-            if (character == ' ' || character == '/'){
-                word.append(character);
-            }
-            else {
-
-            }
-        }
-    }
-
     private Token checkIdentifiers(String s) {
         StringBuilder word = new StringBuilder(s);
         while (true) {
@@ -613,10 +600,6 @@ public class LexicalAnalyzer {
             if (isAlphabet(character) || isDigit(character)) {
                 word.append(character);
             }
-//            else if (!isAlphabet(character) || !isDigit(character)){
-//                errorsList.add(new Errors(lineNumber, "Identifier Error", "Identifier cannot have special characters.", String.valueOf(word)));
-//                return null;
-//            }
             else {
                 if (checkTokenName(String.valueOf(word))) {
                     return new Token(String.valueOf(startAttribute),String.valueOf(word), "ID", String.valueOf(word), "-", lineNumber);
