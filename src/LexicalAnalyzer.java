@@ -32,7 +32,7 @@ public class LexicalAnalyzer {
         symbolTable.add(new Token(String.valueOf(startAttribute++), "while" ,"WHILE", "-", "-", lineNumber));
     }
 
-    public void printTable() {
+    public Formatter printTable() {
         System.out.println("\t\t\t\t\t\t\tSYMBOL TABLE");
         System.out.println("-------------------------------------------------------------------------");
         System.out.println("Attribute Value\t\tToken Name\t\t\tType\t\tValue");
@@ -43,8 +43,9 @@ public class LexicalAnalyzer {
         }
         System.out.println(fmt);
         System.out.println("-----------------------------------------------------------------------");
+        return fmt;
     }
-    public void printLexTable() {
+    public Formatter printLexTable() {
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println("\t\t\t\t\t\t\t\t\t\tTOKENS");
         System.out.println("-----------------------------------------------------------------------------------------");
@@ -56,9 +57,10 @@ public class LexicalAnalyzer {
         }
         System.out.println(fmt);
         System.out.println("-----------------------------------------------------------------------------------------");
+        return fmt;
     }
 
-    public void errorTable() {
+    public Formatter errorTable() {
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println("\t\t\t\t\t\t\t\t\t\tERRORS");
         System.out.println("-----------------------------------------------------------------------------------------");
@@ -70,6 +72,7 @@ public class LexicalAnalyzer {
         }
         System.out.println(fmt);
         System.out.println("-----------------------------------------------------------------------------------------");
+        return fmt;
     }
 
     public void generateTokens() {

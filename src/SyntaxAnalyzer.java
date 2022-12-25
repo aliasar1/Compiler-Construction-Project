@@ -1,9 +1,4 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Stack;
 
@@ -30,38 +25,33 @@ class SyntaxAnalyzer{
     };
     Token EOF_TOKEN = new Token("-", "$", "EOF", "$", "-", Integer.MAX_VALUE);
 
-    public SyntaxAnalyzer(String sourceCode){
+    public SyntaxAnalyzer(String sourceCode) {
         LexicalAnalyzer la = new LexicalAnalyzer(sourceCode);
         tokenList = la.tokens;
         tokenList.add(EOF_TOKEN);
         parseTree.push("0");
         str = tokenList.get(i).lexeme;
-        show();
-    }
-
-    private  void show(){
-        for (Token token : tokenList) {
-            System.out.println(token.lexeme);
-        }
     }
 
     public boolean recognizeSyntax(){
         while (true){
             String s = check(parseTree.peek(), str);
+            if (Objects.equals(s, "")){
+                System.out.println("Error found at line " + tokenList.get(i-1).lineNumber);
+                return false;
+            }
             // edge case
             String findResultOp = String.valueOf(s.charAt(0));
             String findResultID = s.substring(1);
+
+            if (s.equals("NULL")) {
+                return false;
+            }
 
             if (findResultOp.equals("s")){
                 shift(findResultID, String.valueOf(tokenList.get(i).lexeme));
                 i++;
                 str = tokenList.get(i).lexeme;
-//                if (tokenList.isEmpty()){
-//                    str = "$";
-//                }else {
-//                    i++;
-//                    str = tokenList.get(i).lexeme;
-//                }
             }
             else if (findResultOp.equals("r")){
                 reduce(findResultID);
@@ -122,26 +112,36 @@ class SyntaxAnalyzer{
             secondTop = "ID";
         int col;
         int ID = Integer.parseInt(Top);
-        if (secondTop.equals("ID")) {
-            col = 0;
-        } else if (secondTop.equals("+")) {
-            col = 1;
-        } else if (secondTop.equals("*")) {
-            col = 2;
-        } else if (secondTop.equals("(")) {
-            col = 3;
-        } else if (secondTop.equals(")")) {
-            col = 4;
-        } else if (secondTop.equals("$")) {
-            col = 5;
-        } else if (secondTop.equals("E")) {
-            col = 6;
-        } else if (secondTop.equals("T")) {
-            col = 7;
-        } else if (secondTop.equals("F")) {
-            col = 8;
-        } else {
-            return "NULL";
+        switch (secondTop) {
+            case "ID":
+                col = 0;
+                break;
+            case "+":
+                col = 1;
+                break;
+            case "*":
+                col = 2;
+                break;
+            case "(":
+                col = 3;
+                break;
+            case ")":
+                col = 4;
+                break;
+            case "$":
+                col = 5;
+                break;
+            case "E":
+                col = 6;
+                break;
+            case "T":
+                col = 7;
+                break;
+            case "F":
+                col = 8;
+                break;
+            default:
+                return "NULL";
         }
         return slrTable[ID][col];
     }

@@ -1,6 +1,7 @@
 public class Main {
     public static void main(String[] args) {
-//         MainFrame frame = new MainFrame();
+         MainForm frame = new MainForm();
+         frame.createGUI();
 //        String sc = """
 //                int val1 = 21; // to store a value
 //                int val2;
@@ -22,15 +23,15 @@ public class Main {
 //        lex.printLexTable();
 //        lex.printTable();
         // lex.errorTable();
-        String s = "(val2 + val1) * val3";
-        SyntaxAnalyzer sa = new SyntaxAnalyzer(s);
-        boolean f = sa.recognizeSyntax();
-        System.out.println(f);
-        if (f){
-            System.out.println("Accepted!");
-        }
-        else {
-            System.out.println("Rejected!");
-        }
+//        String s = "(val2 + val1) * val3 ";
+//        SyntaxAnalyzer sa = new SyntaxAnalyzer(s);
+//        boolean f = sa.recognizeSyntax();
+//        System.out.println(f);
+//        if (f){
+//            System.out.println("Accepted!");
+//        }
+//        else {
+//            System.out.println("Rejected!");
+//        }
     }
 }
