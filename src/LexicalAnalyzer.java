@@ -593,7 +593,7 @@ public class LexicalAnalyzer {
         return (char) -1;
     }
 
-    private Token checkIdentifiers(String s) {
+    public Token checkIdentifiers(String s) {
         StringBuilder word = new StringBuilder(s);
         while (true) {
             character = readNextCharacter();
