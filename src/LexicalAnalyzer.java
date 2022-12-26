@@ -33,30 +33,17 @@ public class LexicalAnalyzer {
     }
 
     public Formatter printTable() {
-        System.out.println("\t\t\t\t\t\t\tSYMBOL TABLE");
-        System.out.println("-------------------------------------------------------------------------");
-        System.out.println("Attribute Value\t\tToken Name\t\t\tType\t\tValue");
-        System.out.println("-------------------------------------------------------------------------");
         Formatter fmt = new Formatter();
         for (Token token : symbolTable) {
-            fmt.format("%6s  %16s %16s %16s\n", token.attributeValue, token.tokenName, token.type, token.value);
+            fmt.format("%16s  %50s %50s %60s\n", token.attributeValue, token.tokenName, token.type, token.value);
         }
-        System.out.println(fmt);
-        System.out.println("-----------------------------------------------------------------------");
         return fmt;
     }
     public Formatter printLexTable() {
-        System.out.println("-----------------------------------------------------------------------------------------");
-        System.out.println("\t\t\t\t\t\t\t\t\t\tTOKENS");
-        System.out.println("-----------------------------------------------------------------------------------------");
-        System.out.println("\t\tLexemes\t\t\t\tToken Name\t\t\tAttribute Value\t\t\tLine Number");
-        System.out.println("-----------------------------------------------------------------------------------------");
         Formatter fmt = new Formatter();
         for (Token token : tokens) {
-            fmt.format("%14s  %20s  %14s  %28s\n", token.lexeme, token.tokenName, token.attributeValue, " on line " + token.lineNumber);
+            fmt.format("%14s  %50s  %50s  %60s\n", token.lexeme, token.tokenName, token.attributeValue, " on line " + token.lineNumber);
         }
-        System.out.println(fmt);
-        System.out.println("-----------------------------------------------------------------------------------------");
         return fmt;
     }
 

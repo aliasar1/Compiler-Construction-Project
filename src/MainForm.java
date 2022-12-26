@@ -78,11 +78,15 @@ public class MainForm extends JFrame {
         setVisible(true);
 
         button1.addActionListener(e -> {
+          String line = "------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+          String h2 = line+"\t\t\tSYMBOL TABLE\n"+line+"   Attribute Value\t\tToken Name\t\tType\t\tValue\n"+line;
+          String h1 = line+"\t\t\tTOKENS\n"+line+"      Lexemes\t\tToken Name\t\tAttribute Value\t\tLine Number\n"+line;
           String s = inputTextArea.getText();
           LexicalAnalyzer lx = new LexicalAnalyzer(s);
           Formatter f1 = lx.printLexTable();
+          String output = h1 + f1.toString() + line;
           Formatter f2 = lx.printTable();
-          outputTextArea.setText(f1.toString() + "\n" + f2.toString());
+          outputTextArea.setText(output + h2 + f2.toString() + line);
         });
 
         button2.addActionListener(e -> {
@@ -95,107 +99,6 @@ public class MainForm extends JFrame {
                 outputTextArea.setText("Compiled failed!");
         });
 
-        button3.addActionListener(e -> {
-            System.exit(0);
-        });
+        button3.addActionListener(e -> System.exit(0));
     }
 }
-
-
-
-//import javax.swing.*;
-//import java.awt.*;
-//import java.awt.*;
-//import javax.swing.*;
-//
-//public class MainForm extends JFrame {
-//    public MainForm() {
-//        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-//        setMinimumSize(new Dimension(screenSize));
-//        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//        pack();
-//        setTitle("Compiler Construction");
-//        setDefaultCloseOperation(EXIT_ON_CLOSE);
-//
-////        JLabel inputLabel = new JLabel("Input Code");
-////        inputLabel.setBounds(50, 5, 20,50);
-////        JLabel outputLabel = new JLabel("Output");
-//
-//        JTextArea inputTextArea = new JTextArea();
-//        inputTextArea.setLineWrap(true);
-//        inputTextArea.setWrapStyleWord(true);
-//
-//        // Create left scroll pane
-//        JScrollPane leftScrollPane = new JScrollPane();
-//        leftScrollPane.setPreferredSize(new Dimension(500, 50));
-//        leftScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-//        leftScrollPane.setViewportView(inputTextArea);
-//
-//        JTextArea outputTextArea = new JTextArea();
-//        outputTextArea.setLineWrap(true);
-//        outputTextArea.setWrapStyleWord(true);
-//        // Create right scroll pane
-//        JScrollPane rightScrollPane = new JScrollPane();
-//        rightScrollPane.setPreferredSize(new Dimension(500, 50));
-//        rightScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-//        rightScrollPane.setViewportView(outputTextArea);
-//
-//        // Create button panel
-//
-//        JPanel buttonPanel = new JPanel();
-//        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-//        JButton button1 = new JButton("Button 1");
-//        JButton button2 = new JButton("Button 2");
-//        JButton button3 = new JButton("Button 3");
-//        button1.setAlignmentX(Component.CENTER_ALIGNMENT);
-//        button2.setAlignmentX(Component.CENTER_ALIGNMENT);
-//        button3.setAlignmentX(Component.CENTER_ALIGNMENT);
-//        button1.setAlignmentY(Component.CENTER_ALIGNMENT);
-//        button2.setAlignmentY(Component.CENTER_ALIGNMENT);
-//        button3.setAlignmentY(Component.CENTER_ALIGNMENT);
-//        buttonPanel.add(button1);
-//        buttonPanel.add(button2);
-//        buttonPanel.add(button3);
-//
-//        // Add components to main panel
-//        JPanel mainPanel = new JPanel();
-//        mainPanel.setLayout(new BorderLayout());
-//        mainPanel.add(leftScrollPane, BorderLayout.WEST);
-//        mainPanel.add(buttonPanel, BorderLayout.CENTER);
-//        mainPanel.add(rightScrollPane, BorderLayout.EAST);
-////        mainPanel.add(inputLabel);
-////        mainPanel.add(outputLabel);
-//
-//        // Add main panel to frame
-//        add(mainPanel);
-//    }
-//
-//    public static void main(String[] args) {
-//        MainForm frame = new MainForm();
-//        frame.setVisible(true);
-//    }
-//}
-//
-//
-////public class MainForm extends JFrame{
-////    private JFrame mainFrame = new JFrame("Compiler Construction");
-////    private JScrollPane inputCode = new JScrollPane();
-////    private JScrollPane output = new JScrollPane();
-////
-////    public MainForm(){
-////
-////        inputCode.setAlignmentX(4);
-////        inputCode.setAlignmentY(20);
-////        inputCode.createVerticalScrollBar();
-////        inputCode.createHorizontalScrollBar();
-////        inputCode.setVisible(true);
-////
-////        mainFrame.add(inputCode);
-////
-////        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-////        mainFrame.setMinimumSize(new Dimension(screenSize));
-////        mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-////        mainFrame.pack();
-////        mainFrame.setVisible(true);
-////    }
-////}
