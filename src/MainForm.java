@@ -84,6 +84,20 @@ public class MainForm extends JFrame {
           Formatter f2 = lx.printTable();
           outputTextArea.setText(f1.toString() + "\n" + f2.toString());
         });
+
+        button2.addActionListener(e -> {
+            String s = inputTextArea.getText();
+            SyntaxAnalyzer sa = new SyntaxAnalyzer(s);
+            boolean f = sa.recognizeSyntax();
+            if (f)
+                outputTextArea.setText("Compiled Successfully!");
+            else
+                outputTextArea.setText("Compiled failed!");
+        });
+
+        button3.addActionListener(e -> {
+            System.exit(0);
+        });
     }
 }
 
