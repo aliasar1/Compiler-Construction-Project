@@ -8,6 +8,7 @@ public class LexicalAnalyzer {
     int startAttribute = 0;
     char character;
     int lineNumber = 1;
+    boolean flag = true;
 
     BufferedReader reader;
     public final ArrayList<Token> tokens = new ArrayList<>();
@@ -25,7 +26,7 @@ public class LexicalAnalyzer {
     private void initializeReserveKeywords() {
         symbolTable.add(new Token(String.valueOf(startAttribute++), "int" ,"INT", "-", "-", lineNumber));
         symbolTable.add(new Token(String.valueOf(startAttribute++), "char" ,"CHAR", "-", "-", lineNumber));
-        symbolTable.add(new Token(String.valueOf(startAttribute++), "String" ,"STRING", "-", "-", lineNumber));
+        symbolTable.add(new Token(String.valueOf(startAttribute++), "string" ,"STRING", "-", "-", lineNumber));
         symbolTable.add(new Token(String.valueOf(startAttribute++), "if" ,"IF", "-", "-", lineNumber));
         symbolTable.add(new Token(String.valueOf(startAttribute++), "else" ,"ELSE", "-", "-", lineNumber));
         symbolTable.add(new Token(String.valueOf(startAttribute++), "do" ,"DO", "-", "-", lineNumber));
@@ -48,17 +49,11 @@ public class LexicalAnalyzer {
     }
 
     public Formatter errorTable() {
-        System.out.println("-----------------------------------------------------------------------------------------");
-        System.out.println("\t\t\t\t\t\t\t\t\t\tERRORS");
-        System.out.println("-----------------------------------------------------------------------------------------");
-        System.out.println("\t\tLexemes\t\t\t\tError Type\t\t\tDescription\t\t\tLine Number");
-        System.out.println("-----------------------------------------------------------------------------------------");
         Formatter fmt = new Formatter();
         for (Errors error : errorsList) {
-            fmt.format("%14s  %20s  %30s  %10s\n", error.lexeme, error.errorType, error.errorMessage, " on line " + error.lineNumber);
+            fmt.format("%14s  %50s  %60s  %40s\n", error.lexeme, error.errorType, error.errorMessage, " on line " + error.lineNumber);
         }
         System.out.println(fmt);
-        System.out.println("-----------------------------------------------------------------------------------------");
         return fmt;
     }
 
@@ -80,6 +75,9 @@ public class LexicalAnalyzer {
                 tokens.add(token);
             }
             token = readNextToken();
+            if (token == null && flag){
+                token = readNextToken();
+            }
         }
     }
 
@@ -119,6 +117,7 @@ public class LexicalAnalyzer {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                flag = false;
                 return null;
             }
             if (character == '\n') {
@@ -174,7 +173,7 @@ public class LexicalAnalyzer {
                         state = 60;
                     }
                     else {
-                        callErrorRoutine();
+                        callErrorRoutine(true);
                     }
                 }
                 case 1 -> {
@@ -302,7 +301,7 @@ public class LexicalAnalyzer {
                     } else if (character == 'f') {
                         state = 39;
                     } else {
-                        return checkIdentifiers("i");
+                        return checkIdentifiers("i"+character);
                     }
                 }
                 case 21 -> {
@@ -310,7 +309,7 @@ public class LexicalAnalyzer {
                     if (character == 't') {
                         state = 22;
                     } else {
-                        return checkIdentifiers("in");
+                        return checkIdentifiers("in"+character);
                     }
                 }
                 case 22 -> {
@@ -333,7 +332,7 @@ public class LexicalAnalyzer {
                     if (character == 'h') {
                         state = 26;
                     } else {
-                        return checkIdentifiers("c");
+                        return checkIdentifiers("c"+character);
                     }
                 }
                 case 26 -> {
@@ -341,7 +340,7 @@ public class LexicalAnalyzer {
                     if (character == 'a') {
                         state = 27;
                     } else {
-                        return checkIdentifiers("ch");
+                        return checkIdentifiers("ch"+character);
                     }
                 }
                 case 27 -> {
@@ -349,7 +348,7 @@ public class LexicalAnalyzer {
                     if (character == 'r') {
                         state = 28;
                     } else {
-                        return checkIdentifiers("cha");
+                        return checkIdentifiers("cha"+character);
                     }
                 }
                 case 28 -> {
@@ -373,7 +372,7 @@ public class LexicalAnalyzer {
                     if (character == 't') {
                         state = 32;
                     } else {
-                        return checkIdentifiers("s");
+                        return checkIdentifiers("s"+character);
                     }
                 }
                 case 32 -> {
@@ -381,21 +380,21 @@ public class LexicalAnalyzer {
                     if (character == 'r') {
                         state = 33;
                     } else
-                        return checkIdentifiers("st");
+                        return checkIdentifiers("st"+character);
                 }
                 case 33 -> {
                     character = readNextCharacter();
                     if (character == 'i') {
                         state = 34;
                     } else
-                        return checkIdentifiers("str");
+                        return checkIdentifiers("str"+character);
                 }
                 case 34 -> {
                     character = readNextCharacter();
                     if (character == 'n') {
                         state = 35;
                     } else {
-                        return checkIdentifiers("stri");
+                        return checkIdentifiers("stri"+character);
                     }
                 }
                 case 35 -> {
@@ -403,7 +402,7 @@ public class LexicalAnalyzer {
                     if (character == 'g') {
                         state = 36;
                     } else {
-                        return checkIdentifiers("strin");
+                        return checkIdentifiers("strin"+character);
                     }
                 }
                 case 36 -> {
@@ -440,21 +439,21 @@ public class LexicalAnalyzer {
                     if (character == 'l')
                         state = 43;
                     else
-                        return checkIdentifiers("e");
+                        return checkIdentifiers("e"+character);
                 }
                 case 43 -> {
                     character = readNextCharacter();
                     if (character == 's')
                         state = 44;
                     else
-                        return checkIdentifiers("el");
+                        return checkIdentifiers("el"+character);
                 }
                 case 44 -> {
                     character = readNextCharacter();
                     if (character == 'e')
                         state = 45;
                     else
-                        return checkIdentifiers("els");
+                        return checkIdentifiers("els"+character);
                 }
                 case 45 -> {
                     character = readNextCharacter();
@@ -475,7 +474,7 @@ public class LexicalAnalyzer {
                     if (character == 'O') {
                         state = 49;
                     } else {
-                        return checkIdentifiers("D");
+                        return checkIdentifiers("D"+character);
                     }
                 }
                 case 49 -> {
@@ -498,7 +497,7 @@ public class LexicalAnalyzer {
                     if (character == 'h') {
                         state = 53;
                     } else {
-                        return checkIdentifiers("w");
+                        return checkIdentifiers("w"+character);
                     }
                 }
                 case 53 -> {
@@ -506,7 +505,7 @@ public class LexicalAnalyzer {
                     if (character == 'i') {
                         state = 54;
                     } else {
-                        return checkIdentifiers("wh");
+                        return checkIdentifiers("wh"+character);
                     }
                 }
                 case 54 -> {
@@ -514,7 +513,7 @@ public class LexicalAnalyzer {
                     if (character == 'l') {
                         state = 55;
                     } else {
-                        return checkIdentifiers("whi");
+                        return checkIdentifiers("whi"+character);
                     }
                 }
                 case 55 -> {
@@ -522,7 +521,7 @@ public class LexicalAnalyzer {
                     if (character == 'e') {
                         state = 56;
                     } else {
-                        return checkIdentifiers("whil");
+                        return checkIdentifiers("whil"+character);
                     }
                 }
                 case 56 -> {
@@ -567,12 +566,25 @@ public class LexicalAnalyzer {
                     character = readNextCharacter();
                     return new Token(String.valueOf(startAttribute), String.valueOf(word), "SL",String.valueOf(word),"-" , lineNumber);
                 }
-                default -> callErrorRoutine();
+                default -> callErrorRoutine(false);
             }
         }
     }
 
-    private void callErrorRoutine(){}
+    private void callErrorRoutine(boolean isInvalidLexeme){
+        StringBuilder str = new StringBuilder();
+        if (isInvalidLexeme) {
+            str.append(character);
+            while (true) {
+                character = readNextCharacter();
+                if (character == ' ' || character == '\n' || character == ';' || character == (char) -1){
+                    errorsList.add(new Errors(lineNumber, "Invalid Lexeme", "Message: Invalid Lexeme Found.", String.valueOf(str)));
+                    return;
+                }
+                str.append(character);
+            }
+        }
+    }
 
     private char readNextCharacter() {
         try {
@@ -589,6 +601,18 @@ public class LexicalAnalyzer {
             character = readNextCharacter();
             if (isAlphabet(character) || isDigit(character)) {
                 word.append(character);
+            }
+            else if (!Character.isLetterOrDigit(character) && !(character == ' ' || character == '\n' || character == ';' || character == (char) -1)){
+                word.append(character);
+                while (true){
+                    character = readNextCharacter();
+                    if (character == ' ' || character == '\n' || character == ';' || character == (char) -1){
+                        errorsList.add(new Errors(lineNumber, "Invalid Identifier", "Message: Invalid Identifier Found.", String.valueOf(word)));
+                        flag = true;
+                        return null;
+                    }
+                    word.append(character);
+                }
             }
             else {
                 if (checkTokenName(String.valueOf(word))) {

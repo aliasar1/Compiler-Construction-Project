@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.Formatter;
 
 public class MainForm extends JFrame {
@@ -78,25 +80,38 @@ public class MainForm extends JFrame {
         setVisible(true);
 
         button1.addActionListener(e -> {
-          String line = "------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+            try {
+                System.setErr(new PrintStream("error.log"));
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+            String line = "------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
           String h2 = line+"\t\t\tSYMBOL TABLE\n"+line+"   Attribute Value\t\tToken Name\t\tType\t\tValue\n"+line;
-          String h1 = line+"\t\t\tTOKENS\n"+line+"      Lexemes\t\tToken Name\t\tAttribute Value\t\tLine Number\n"+line;
+          String h1 = line+"\t\t\tTOKENS\n"+line+"      Lexeme\t\tToken Name\t\tAttribute Value\t\tLine Number\n"+line;
+          String h3 = line+"\t\t\tErrors\n"+line+"      Lexeme\t\tError Type\t\tError Description\t\tLine Number\n"+line;
           String s = inputTextArea.getText();
           LexicalAnalyzer lx = new LexicalAnalyzer(s);
           Formatter f1 = lx.printLexTable();
           String output = h1 + f1.toString() + line;
           Formatter f2 = lx.printTable();
-          outputTextArea.setText(output + h2 + f2.toString() + line);
+          Formatter f3 = lx.errorTable();
+          outputTextArea.setText(output + h2 + f2.toString() + line + h3 + f3.toString() + line);
         });
 
         button2.addActionListener(e -> {
+            try {
+                System.setErr(new PrintStream("error.log"));
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
             String s = inputTextArea.getText();
             SyntaxAnalyzer sa = new SyntaxAnalyzer(s);
             boolean f = sa.recognizeSyntax();
             if (f)
                 outputTextArea.setText("Compiled Successfully!");
-            else
-                outputTextArea.setText("Compiled failed!");
+            else{
+                 outputTextArea.setText(sa.error + "\nCompilation failed!");
+            }
         });
 
         button3.addActionListener(e -> System.exit(0));

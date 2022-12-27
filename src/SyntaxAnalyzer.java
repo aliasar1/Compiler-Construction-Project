@@ -8,6 +8,7 @@ class SyntaxAnalyzer{
     Stack<String> parseTree = new Stack<>();
     boolean flag = false;
     String str;
+    public String error;
     String[] productionRules = {"E -> E + T", "E -> T", "T -> T * F", "T -> F", "F -> ( E )", "F -> id"};
     public String[][] slrTable = {
             {"s5", "", "", "s4", "", "", "1", "2", "3"},
@@ -36,11 +37,10 @@ class SyntaxAnalyzer{
     public boolean recognizeSyntax(){
         while (true){
             String s = check(parseTree.peek(), str);
-            if (Objects.equals(s, "")){
-                System.out.println("Error found at line " + tokenList.get(i-1).lineNumber);
+            if (Objects.equals(s, "")) {
+                error = "Error found at line " + tokenList.get(i - 1).lineNumber;
                 return false;
             }
-            // edge case
             String findResultOp = String.valueOf(s.charAt(0));
             String findResultID = s.substring(1);
 
