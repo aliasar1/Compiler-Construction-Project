@@ -123,6 +123,15 @@ public class LexicalAnalyzer {
             if (character == '\n') {
                 character = readNextCharacter();
                 lineNumber++;
+                if (character == '\uFFFF'){
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    flag = false;
+                    return null;
+                }
             }
             switch (state) {
                 case 0 -> {
@@ -188,7 +197,7 @@ public class LexicalAnalyzer {
                 }
                 case 2 -> {
                     character = readNextCharacter();
-                    return new Token("GE", ">=","ROP", "GE", "-", lineNumber);
+                    return new Token("GE", ">=","ROP", "LE", "-", lineNumber);
                 }
                 case 3 -> {
                     character = readNextCharacter();
@@ -214,13 +223,17 @@ public class LexicalAnalyzer {
                     character = readNextCharacter();
                     if (character == '=') {
                         state = 8;
-                    } else {
+                    }
+                    else if (character == ' '){
+                        character = readNextCharacter();
+                    }
+                    else {
                         state = 9;
                     }
                 }
                 case 8 -> {
                     character = readNextCharacter();
-                    return new Token("LE", "<=","ROP", "LE", "-", lineNumber);
+                    return new Token("LE", ">=","ROP", "GE", "-", lineNumber);
                 }
                 case 9 -> {
                     character = readNextCharacter();
@@ -270,7 +283,6 @@ public class LexicalAnalyzer {
                     }
                 }
                 case 14 -> {
-                    character = readNextCharacter();
                     return new Token("AS", "=","OOP", "AS", "-", lineNumber);
                 }
                 case 15 -> {
@@ -543,18 +555,11 @@ public class LexicalAnalyzer {
                     return checkIdentifiers(String.valueOf(character));
                 }
                 case 60 -> {
-                    StringBuilder word = new StringBuilder(String.valueOf(character));
-                    while (true) {
-                        character = readNextCharacter();
-                        if (isDigit(character)) {
-                            word.append(character);
-                        } else {
-                            if (checkTokenName(String.valueOf(word))) {
-                                return new Token(String.valueOf(startAttribute), String.valueOf(word),"IV", String.valueOf(word), "-", lineNumber);
-                            }
-                            break;
-                        }
-                    }
+                    Token t = checkInteger();
+                    if (t != null)
+                        return t;
+                    else
+                        state = 0;
                 }
                 case 61 -> {
                     character = readNextCharacter();
@@ -571,13 +576,45 @@ public class LexicalAnalyzer {
         }
     }
 
+    private Token checkInteger(){
+        StringBuilder word = new StringBuilder(String.valueOf(character));
+        while (true) {
+            character = readNextCharacter();
+            if (isDigit(character)) {
+                word.append(character);
+            }
+            else if (!isDigit(character) && (isAlphabet(character) || !(character == ' ' || character == '\n' || character == ';' || character == '=' || character == ')'|| character == (char) -1))){
+                while (true){
+                    word.append(character);
+                    if (character == ' ' || character == '\n' || character == ';' || character == '=' || character == ')'|| character == (char) -1){
+                        errorsList.add(new Errors(lineNumber, "Invalid Lexeme", "Message: Invalid Lexeme Found.", String.valueOf(word)));
+                        return null;
+                    }
+                    character = readNextCharacter();
+                }
+            }
+            else {
+                if (checkTokenName(String.valueOf(word))) {
+                    return new Token(String.valueOf(startAttribute), String.valueOf(word),"IV", String.valueOf(word), "-", lineNumber);
+                }
+            }
+        }
+    }
+
+    public boolean isSpecialCharacter(char c) {
+        if (!Character.isDigit(c)) {
+            return !Character.isLetter(c);
+        }
+        return false;
+    }
+
     private void callErrorRoutine(boolean isInvalidLexeme){
         StringBuilder str = new StringBuilder();
         if (isInvalidLexeme) {
             str.append(character);
             while (true) {
                 character = readNextCharacter();
-                if (character == ' ' || character == '\n' || character == ';' || character == (char) -1){
+                if (character == ' ' || character == '\n' || character == ';' || character == '=' || character == ')'|| character == (char) -1){
                     errorsList.add(new Errors(lineNumber, "Invalid Lexeme", "Message: Invalid Lexeme Found.", String.valueOf(str)));
                     return;
                 }
@@ -602,11 +639,18 @@ public class LexicalAnalyzer {
             if (isAlphabet(character) || isDigit(character)) {
                 word.append(character);
             }
-            else if (!Character.isLetterOrDigit(character) && !(character == ' ' || character == '\n' || character == ';' || character == (char) -1)){
+            else if (character == ' ' || character == '\n' || character == ';' || character == '=' || character == ')'|| character == (char) -1 || checkRelopAndArtop(character)){
+                if (checkTokenName(String.valueOf(word))) {
+                    return new Token(String.valueOf(startAttribute),String.valueOf(word), "ID", String.valueOf(word), "-", lineNumber);
+                }
+                break;
+            }
+            else {
                 word.append(character);
+                char temp = character;
                 while (true){
                     character = readNextCharacter();
-                    if (character == ' ' || character == '\n' || character == ';' || character == (char) -1){
+                    if (character == ' ' || character == '\n' || character == ';' || character == '=' || character == ')'|| character == (char) -1){
                         errorsList.add(new Errors(lineNumber, "Invalid Identifier", "Message: Invalid Identifier Found.", String.valueOf(word)));
                         flag = true;
                         return null;
@@ -614,14 +658,54 @@ public class LexicalAnalyzer {
                     word.append(character);
                 }
             }
-            else {
-                if (checkTokenName(String.valueOf(word))) {
-                    return new Token(String.valueOf(startAttribute),String.valueOf(word), "ID", String.valueOf(word), "-", lineNumber);
-                }
-                break;
-            }
         }
         return null;
+    }
+
+    boolean checkRelopAndArtop(char c){
+        StringBuilder str = new StringBuilder();
+        str.append(c);
+        if (c == '+' || c == '-' || c == '/' || c == '*' || c == '(' || c == ')' || c == '{' || c == '}'){
+            return true;
+        }
+        else{
+            if (c == '<'){
+                character = readNextCharacter();
+                c = character;
+                if (c == '='){
+                    str.append(character);
+                    return true;
+                }
+                else if (c == '>'){
+                    str.append(character);
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else if (c == '>'){
+                character = readNextCharacter();
+                c = character;
+                if (c == '='){
+                    str.append(c);
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else if (c == '='){
+                character = readNextCharacter();
+                c = character;
+                if (c == '='){
+                    str.append(c);
+                    return true;
+                }
+                else
+                    return false;
+            }
+        }
+        return false;
     }
 
     boolean isDigit(char c) {
