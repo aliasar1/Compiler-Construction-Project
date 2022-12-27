@@ -255,13 +255,14 @@ public class LexicalAnalyzer {
                     character = readNextCharacter();
                     if (character == '/') {
                         character = readNextCharacter();
-                        while (character != '\n') {
+                        while (character != '\n' && character != '\uFFFF') {
                             character = readNextCharacter();
                         }
                         character = readNextCharacter();
                         lineNumber++;
                         state = 0;
                     } else if (character == '*') {
+                        character = readNextCharacter();
                         while (true){
                             if (character == '*' && (readNextCharacter() == '/')){
                                 break;
@@ -273,10 +274,6 @@ public class LexicalAnalyzer {
                                 lineNumber++;
                         }
                         character = readNextCharacter();
-                        while (character != '\n')
-                            character = readNextCharacter();
-                        character = readNextCharacter();
-                        lineNumber++;
                         state = 0;
                     } else {
                         return new Token("DV", "/","AOP", "DV", "-", lineNumber);
@@ -486,7 +483,7 @@ public class LexicalAnalyzer {
                     if (character == 'O') {
                         state = 49;
                     } else {
-                        return checkIdentifiers("D"+character);
+                        return checkIdentifiers("d"+character);
                     }
                 }
                 case 49 -> {
