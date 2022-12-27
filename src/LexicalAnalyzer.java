@@ -647,7 +647,6 @@ public class LexicalAnalyzer {
             }
             else {
                 word.append(character);
-                char temp = character;
                 while (true){
                     character = readNextCharacter();
                     if (character == ' ' || character == '\n' || character == ';' || character == '=' || character == ')'|| character == (char) -1){
@@ -663,8 +662,6 @@ public class LexicalAnalyzer {
     }
 
     boolean checkRelopAndArtop(char c){
-        StringBuilder str = new StringBuilder();
-        str.append(c);
         if (c == '+' || c == '-' || c == '/' || c == '*' || c == '(' || c == ')' || c == '{' || c == '}'){
             return true;
         }
@@ -673,36 +670,19 @@ public class LexicalAnalyzer {
                 character = readNextCharacter();
                 c = character;
                 if (c == '='){
-                    str.append(character);
                     return true;
                 }
-                else if (c == '>'){
-                    str.append(character);
-                    return true;
-                }
-                else {
-                    return false;
-                }
+                else return c == '>';
             }
             else if (c == '>'){
                 character = readNextCharacter();
                 c = character;
-                if (c == '='){
-                    str.append(c);
-                    return true;
-                }
-                else
-                    return false;
+                return c == '=';
             }
             else if (c == '='){
                 character = readNextCharacter();
                 c = character;
-                if (c == '='){
-                    str.append(c);
-                    return true;
-                }
-                else
-                    return false;
+                return c == '=';
             }
         }
         return false;
