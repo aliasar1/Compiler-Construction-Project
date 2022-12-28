@@ -6,7 +6,6 @@ class SyntaxAnalyzer{
     ArrayList<Token> tokenList;
     int i = 0;
     Stack<String> parseTree = new Stack<>();
-    boolean flag = false;
     String str;
     public String error;
     String[] productionRules = {"E -> E + T", "E -> T", "T -> T * F", "T -> F", "F -> ( E )", "F -> id"};
@@ -37,6 +36,10 @@ class SyntaxAnalyzer{
     public boolean recognizeSyntax(){
         while (true){
             String s = check(parseTree.peek(), str);
+            if (Objects.equals(s, "NULL")){
+                error = "Provided code is not part of the grammar.";
+                return false;
+            }
             if (Objects.equals(s, "")) {
                 error = "Error found at line " + tokenList.get(i - 1).lineNumber;
                 return false;

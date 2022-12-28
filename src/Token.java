@@ -15,9 +15,4 @@ public class Token {
         this.value = value;
         this.lineNumber = line;
     }
-
-    @Override
-    public String toString() {
-        return this.attributeValue + "  " + this.tokenName + "  " + this.value + "  " + this.type + " at line " + this.lineNumber;
-    }
 }

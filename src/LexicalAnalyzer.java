@@ -598,13 +598,6 @@ public class LexicalAnalyzer {
         }
     }
 
-    public boolean isSpecialCharacter(char c) {
-        if (!Character.isDigit(c)) {
-            return !Character.isLetter(c);
-        }
-        return false;
-    }
-
     private void callErrorRoutine(boolean isInvalidLexeme){
         StringBuilder str = new StringBuilder();
         if (isInvalidLexeme) {
