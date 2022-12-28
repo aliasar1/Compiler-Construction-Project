@@ -588,6 +588,10 @@ public class LexicalAnalyzer {
                         return null;
                     }
                     character = readNextCharacter();
+                    if (character == '\uFFFF' || character == '\n'){
+                        errorsList.add(new Errors(lineNumber, "Invalid Lexeme", "Message: Invalid Lexeme Found.", String.valueOf(word)));
+                        return null;
+                    }
                 }
             }
             else {
