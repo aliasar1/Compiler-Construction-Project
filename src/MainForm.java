@@ -93,12 +93,17 @@ public class MainForm extends JFrame {
             String h1 = line+"\t\t\tTOKENS\n"+line+"      Lexeme\t\tToken Name\t\tAttribute Value\t\tLine Number\n"+line;
             String h3 = line+"\t\t\tErrors\n"+line+"      Lexeme\t\tError Type\t\tError Description\t\tLine Number\n"+line;
             String s = inputTextArea.getText();
-            LexicalAnalyzer lx = new LexicalAnalyzer(s);
-            Formatter f1 = lx.printLexTable();
-            String output = h1 + f1.toString() + line;
-            Formatter f2 = lx.printTable();
-            Formatter f3 = lx.errorTable();
-            outputTextArea.setText(output + h2 + f2.toString() + line + h3 + f3.toString() + line);
+            if (s.isBlank() || s.isEmpty()){
+                outputTextArea.setText("Please provide an input source code.");
+            }
+            else {
+                LexicalAnalyzer lx = new LexicalAnalyzer(s);
+                Formatter f1 = lx.printLexTable();
+                String output = h1 + f1.toString() + line;
+                Formatter f2 = lx.printTable();
+                Formatter f3 = lx.errorTable();
+                outputTextArea.setText(output + h2 + f2.toString() + line + h3 + f3.toString() + line);
+            }
         });
 
         button2.addActionListener(e -> {
@@ -112,17 +117,22 @@ public class MainForm extends JFrame {
             String h2 = line+"\t\t\tSYMBOL TABLE\n"+line+"   Attribute Value\t\tToken Name\t\tType\t\tValue\n"+line;
             String h1 = line+"\t\t\tTOKENS\n"+line+"      Lexeme\t\tToken Name\t\tAttribute Value\t\tLine Number\n"+line;
             String s = inputTextArea.getText();
-            SyntaxAnalyzer sa = new SyntaxAnalyzer(s);
-            sa.la.tokens.remove(sa.EOF_TOKEN);
-            sa.la.symbolTable.remove(sa.EOF_TOKEN);
-            Formatter f1 = sa.la.printLexTable();
-            Formatter f2 = sa.la.printTable();
-            String show = h1 + f1.toString() + line + h2 + f2.toString() + line;
-            boolean f = sa.recognizeSyntax();
-            if (f)
-                outputTextArea.setText(show + "\nCompiled Successfully!");
-            else{
-                 outputTextArea.setText(show + sa.error + "\nCompilation failed!");
+            if (s.isBlank() || s.isEmpty()){
+                outputTextArea.setText("Please provide an input source code.");
+            }
+            else {
+                SyntaxAnalyzer sa = new SyntaxAnalyzer(s);
+                sa.la.tokens.remove(sa.EOF_TOKEN);
+                sa.la.symbolTable.remove(sa.EOF_TOKEN);
+                Formatter f1 = sa.la.printLexTable();
+                Formatter f2 = sa.la.printTable();
+                String show = h1 + f1.toString() + line + h2 + f2.toString() + line;
+                boolean f = sa.recognizeSyntax();
+                if (f)
+                    outputTextArea.setText(show + "\nCompiled Successfully!");
+                else{
+                    outputTextArea.setText(show + sa.error + "\nCompilation failed!");
+                }
             }
         });
 

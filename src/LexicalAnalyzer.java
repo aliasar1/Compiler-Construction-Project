@@ -310,7 +310,7 @@ public class LexicalAnalyzer {
                     } else if (character == 'f') {
                         state = 39;
                     } else {
-                        return checkIdentifiers("i"+character);
+                        return checkIdentifiers("i", String.valueOf(character));
                     }
                 }
                 case 21 -> {
@@ -318,11 +318,14 @@ public class LexicalAnalyzer {
                     if (character == 't') {
                         state = 22;
                     } else {
-                        return checkIdentifiers("in"+character);
+                        return checkIdentifiers("in",String.valueOf(character));
                     }
                 }
                 case 22 -> {
                     character = readNextCharacter();
+                    if (character == '\uFFFF'){
+                        return new Token(String.valueOf(startAttribute),"int" ,"INT", "-", "-", lineNumber);
+                    }
                     if (character == ' ') {
                         state = 23;
                     } else {
@@ -334,14 +337,14 @@ public class LexicalAnalyzer {
                     return new Token(String.valueOf(startAttribute),"int" ,"INT", "-", "-", lineNumber);
                 }
                 case 24 -> {
-                    return checkIdentifiers("int" + character);
+                    return checkIdentifiers("int",String.valueOf(character));
                 }
                 case 25 -> {
                     character = readNextCharacter();
                     if (character == 'h') {
                         state = 26;
                     } else {
-                        return checkIdentifiers("c"+character);
+                        return checkIdentifiers("c",String.valueOf(character));
                     }
                 }
                 case 26 -> {
@@ -349,7 +352,7 @@ public class LexicalAnalyzer {
                     if (character == 'a') {
                         state = 27;
                     } else {
-                        return checkIdentifiers("ch"+character);
+                        return checkIdentifiers("ch",String.valueOf(character));
                     }
                 }
                 case 27 -> {
@@ -357,11 +360,14 @@ public class LexicalAnalyzer {
                     if (character == 'r') {
                         state = 28;
                     } else {
-                        return checkIdentifiers("cha"+character);
+                        return checkIdentifiers("cha",String.valueOf(character));
                     }
                 }
                 case 28 -> {
                     character = readNextCharacter();
+                    if (character == '\uFFFF'){
+                        return new Token(String.valueOf(startAttribute), "char","CHAR", "-", "", lineNumber);
+                    }
                     if (character == ' ') {
                         state = 29;
                     } else {
@@ -374,14 +380,14 @@ public class LexicalAnalyzer {
                 }
                 case 30 -> {
                     character = readNextCharacter();
-                    return checkIdentifiers("char" + character);
+                    return checkIdentifiers("char",String.valueOf(character));
                 }
                 case 31 -> {
                     character = readNextCharacter();
                     if (character == 't') {
                         state = 32;
                     } else {
-                        return checkIdentifiers("s"+character);
+                        return checkIdentifiers("s",String.valueOf(character));
                     }
                 }
                 case 32 -> {
@@ -389,21 +395,21 @@ public class LexicalAnalyzer {
                     if (character == 'r') {
                         state = 33;
                     } else
-                        return checkIdentifiers("st"+character);
+                        return checkIdentifiers("st",String.valueOf(character));
                 }
                 case 33 -> {
                     character = readNextCharacter();
                     if (character == 'i') {
                         state = 34;
                     } else
-                        return checkIdentifiers("str"+character);
+                        return checkIdentifiers("str",String.valueOf(character));
                 }
                 case 34 -> {
                     character = readNextCharacter();
                     if (character == 'n') {
                         state = 35;
                     } else {
-                        return checkIdentifiers("stri"+character);
+                        return checkIdentifiers("stri",String.valueOf(character));
                     }
                 }
                 case 35 -> {
@@ -411,11 +417,13 @@ public class LexicalAnalyzer {
                     if (character == 'g') {
                         state = 36;
                     } else {
-                        return checkIdentifiers("strin"+character);
+                        return checkIdentifiers("strin",String.valueOf(character));
                     }
                 }
                 case 36 -> {
                     character = readNextCharacter();
+                    if (character == '\uFFFF')
+                        return new Token(String.valueOf(startAttribute),"string","STRING", "-", "", lineNumber);
                     if (character == ' ') {
                         state = 37;
                     } else {
@@ -427,10 +435,12 @@ public class LexicalAnalyzer {
                     return new Token(String.valueOf(startAttribute),"string","STRING", "-", "", lineNumber);
                 }
                 case 38 -> {
-                    return checkIdentifiers("string" + character);
+                    return checkIdentifiers("string",String.valueOf(character));
                 }
                 case 39 -> {
                     character = readNextCharacter();
+                    if (character == '\uFFFF')
+                        return new Token(String.valueOf(startAttribute), "if","IF", "-", "-", lineNumber);
                     if (character == ' ') {
                         state = 40;
                     } else
@@ -441,31 +451,33 @@ public class LexicalAnalyzer {
                     return new Token(String.valueOf(startAttribute), "if","IF", "-", "-", lineNumber);
                 }
                 case 41 -> {
-                    return checkIdentifiers("if" + character);
+                    return checkIdentifiers("if",String.valueOf(character));
                 }
                 case 42 -> {
                     character = readNextCharacter();
                     if (character == 'l')
                         state = 43;
                     else
-                        return checkIdentifiers("e"+character);
+                        return checkIdentifiers("e",String.valueOf(character));
                 }
                 case 43 -> {
                     character = readNextCharacter();
                     if (character == 's')
                         state = 44;
                     else
-                        return checkIdentifiers("el"+character);
+                        return checkIdentifiers("el",String.valueOf(character));
                 }
                 case 44 -> {
                     character = readNextCharacter();
                     if (character == 'e')
                         state = 45;
                     else
-                        return checkIdentifiers("els"+character);
+                        return checkIdentifiers("els",String.valueOf(character));
                 }
                 case 45 -> {
                     character = readNextCharacter();
+                    if (character == '\uFFFF')
+                        return new Token(String.valueOf(startAttribute), "else", "ELSE", "-", "", lineNumber);
                     if (character == ' ')
                         state = 46;
                     else
@@ -476,18 +488,20 @@ public class LexicalAnalyzer {
                     return new Token(String.valueOf(startAttribute), "else", "ELSE", "-", "", lineNumber);
                 }
                 case 47 -> {
-                    return checkIdentifiers("else" + character);
+                    return checkIdentifiers("else",String.valueOf(character));
                 }
                 case 48 -> {
                     character = readNextCharacter();
-                    if (character == 'O') {
+                    if (character == 'o') {
                         state = 49;
                     } else {
-                        return checkIdentifiers("d"+character);
+                        return checkIdentifiers("d",String.valueOf(character));
                     }
                 }
                 case 49 -> {
                     character = readNextCharacter();
+                    if (character == '\uFFFF')
+                        return new Token(String.valueOf(startAttribute), "do","DO", "", "", lineNumber);
                     if (character == ' ') {
                         state = 50;
                     } else {
@@ -499,14 +513,14 @@ public class LexicalAnalyzer {
                     return new Token(String.valueOf(startAttribute), "do","DO", "", "", lineNumber);
                 }
                 case 51 -> {
-                    return checkIdentifiers("do" + character);
+                    return checkIdentifiers("do",String.valueOf(character));
                 }
                 case 52 -> {
                     character = readNextCharacter();
                     if (character == 'h') {
                         state = 53;
                     } else {
-                        return checkIdentifiers("w"+character);
+                        return checkIdentifiers("w",String.valueOf(character));
                     }
                 }
                 case 53 -> {
@@ -514,7 +528,7 @@ public class LexicalAnalyzer {
                     if (character == 'i') {
                         state = 54;
                     } else {
-                        return checkIdentifiers("wh"+character);
+                        return checkIdentifiers("wh",String.valueOf(character));
                     }
                 }
                 case 54 -> {
@@ -522,7 +536,7 @@ public class LexicalAnalyzer {
                     if (character == 'l') {
                         state = 55;
                     } else {
-                        return checkIdentifiers("whi"+character);
+                        return checkIdentifiers("whi",String.valueOf(character));
                     }
                 }
                 case 55 -> {
@@ -530,11 +544,13 @@ public class LexicalAnalyzer {
                     if (character == 'e') {
                         state = 56;
                     } else {
-                        return checkIdentifiers("whil"+character);
+                        return checkIdentifiers("whil",String.valueOf(character));
                     }
                 }
                 case 56 -> {
                     character = readNextCharacter();
+                    if (character == '\uFFFF')
+                        return new Token(String.valueOf(startAttribute), "while","WHILE", "-", "-", lineNumber);
                     if (character == ' ') {
                         state = 57;
                     } else {
@@ -546,10 +562,10 @@ public class LexicalAnalyzer {
                     return new Token(String.valueOf(startAttribute), "while","WHILE", "-", "-", lineNumber);
                 }
                 case 58 -> {
-                    return checkIdentifiers("while" + character);
+                    return checkIdentifiers("while",String.valueOf(character));
                 }
                 case 59 -> {
-                    return checkIdentifiers(String.valueOf(character));
+                    return checkIdentifiers(String.valueOf(character),"");
                 }
                 case 60 -> {
                     Token t = checkInteger();
@@ -626,8 +642,16 @@ public class LexicalAnalyzer {
         return (char) -1;
     }
 
-    public Token checkIdentifiers(String s) {
+    public Token checkIdentifiers(String s, String newS) {
         StringBuilder word = new StringBuilder(s);
+        if (newS.equals(String.valueOf(' '))){
+            if (checkTokenName(String.valueOf(word))) {
+                return new Token(String.valueOf(startAttribute),String.valueOf(word), "ID", String.valueOf(word), "-", lineNumber);
+            }
+        }
+        else if (!Objects.equals(newS, String.valueOf('\uFFFF'))) {
+            word.append(newS);
+        }
         while (true) {
             character = readNextCharacter();
             if (isAlphabet(character) || isDigit(character)) {
