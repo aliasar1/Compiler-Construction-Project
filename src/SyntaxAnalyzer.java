@@ -35,14 +35,23 @@ class SyntaxAnalyzer{
     }
 
     public boolean recognizeSyntax(){
+        if (!la.errorsList.isEmpty()){
+            String invalid = la.errorsList.get(0).lexeme;
+            String type = la.errorsList.get(0).errorType;
+            if (Objects.equals(type, "Invalid Identifier")){
+                error = "Error found at line " + la.errorsList.get(0).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to invalid identifier found: " + invalid + "\nCannot parse remaining expression.";
+            }
+            else
+                error = "Error found at line " + la.errorsList.get(0).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to invalid lexeme found: " + invalid + "\nCannot parse remaining expression.";
+            return false;
+        }
         while (true){
             String s = check(parseTree.peek(), str);
-            if (Objects.equals(s, "NULL")){
-                error = "Provided expression is not part of the grammar.\nError Occurred due to: " + str + "\nCannot parse remaining expression.";
-                return false;
-            }
-            if (Objects.equals(s, "")) {
-                error = "Error found at line " + tokenList.get(i - 1).lineNumber + "\nError Occurred due to: " + str + "\nCannot parse remaining expression";
+            if (Objects.equals(s, "NULL") || (Objects.equals(s, ""))){
+                if (Objects.equals(str, String.valueOf('$'))){
+                    str = tokenList.get(i-1).lexeme;
+                }
+                error = "Error found at line " + tokenList.get(i - 1).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to: " + str + "\nCannot parse remaining expression.";
                 return false;
             }
             String findResultOp = String.valueOf(s.charAt(0));

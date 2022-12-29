@@ -122,12 +122,12 @@ public class MainForm extends JFrame {
             }
             else {
                 SyntaxAnalyzer sa = new SyntaxAnalyzer(s);
+                boolean f = sa.recognizeSyntax();
                 sa.la.tokens.remove(sa.EOF_TOKEN);
                 sa.la.symbolTable.remove(sa.EOF_TOKEN);
                 Formatter f1 = sa.la.printLexTable();
                 Formatter f2 = sa.la.printTable();
                 String show = h1 + f1.toString() + line + h2 + f2.toString() + line;
-                boolean f = sa.recognizeSyntax();
                 if (f)
                     outputTextArea.setText(show + "\nCompiled Successfully!");
                 else{

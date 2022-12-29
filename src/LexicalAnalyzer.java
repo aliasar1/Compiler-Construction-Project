@@ -13,7 +13,7 @@ public class LexicalAnalyzer {
     BufferedReader reader;
     public final ArrayList<Token> tokens = new ArrayList<>();
     public final ArrayList<Token> symbolTable = new ArrayList<>();
-    private final  ArrayList<Errors> errorsList = new ArrayList<>();
+    public final  ArrayList<Errors> errorsList = new ArrayList<>();
 
     public LexicalAnalyzer(String sourceCode) {
         initializeReserveKeywords();
