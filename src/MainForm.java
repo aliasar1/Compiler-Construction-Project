@@ -7,8 +7,10 @@ import java.util.Formatter;
 public class MainForm extends JFrame {
     public void createGUI() {
         // Set the frame properties
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setMinimumSize(new Dimension(screenSize));
+        // Get the available screen bounds, which will exclude the taskbar
+        Rectangle screenBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        // Set the minimum size of the frame to the available screen bounds
+        setMinimumSize(new Dimension(screenBounds.width, screenBounds.height));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         pack();
         setTitle("Compiler Construction");
@@ -80,37 +82,47 @@ public class MainForm extends JFrame {
         setVisible(true);
 
         button1.addActionListener(e -> {
+            outputTextArea.setText("");
             try {
                 System.setErr(new PrintStream("error.log"));
             } catch (FileNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
             String line = "------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
-          String h2 = line+"\t\t\tSYMBOL TABLE\n"+line+"   Attribute Value\t\tToken Name\t\tType\t\tValue\n"+line;
-          String h1 = line+"\t\t\tTOKENS\n"+line+"      Lexeme\t\tToken Name\t\tAttribute Value\t\tLine Number\n"+line;
-          String h3 = line+"\t\t\tErrors\n"+line+"      Lexeme\t\tError Type\t\tError Description\t\tLine Number\n"+line;
-          String s = inputTextArea.getText();
-          LexicalAnalyzer lx = new LexicalAnalyzer(s);
-          Formatter f1 = lx.printLexTable();
-          String output = h1 + f1.toString() + line;
-          Formatter f2 = lx.printTable();
-          Formatter f3 = lx.errorTable();
-          outputTextArea.setText(output + h2 + f2.toString() + line + h3 + f3.toString() + line);
+            String h2 = line+"\t\t\tSYMBOL TABLE\n"+line+"   Attribute Value\t\tToken Name\t\tType\t\tValue\n"+line;
+            String h1 = line+"\t\t\tTOKENS\n"+line+"      Lexeme\t\tToken Name\t\tAttribute Value\t\tLine Number\n"+line;
+            String h3 = line+"\t\t\tErrors\n"+line+"      Lexeme\t\tError Type\t\tError Description\t\tLine Number\n"+line;
+            String s = inputTextArea.getText();
+            LexicalAnalyzer lx = new LexicalAnalyzer(s);
+            Formatter f1 = lx.printLexTable();
+            String output = h1 + f1.toString() + line;
+            Formatter f2 = lx.printTable();
+            Formatter f3 = lx.errorTable();
+            outputTextArea.setText(output + h2 + f2.toString() + line + h3 + f3.toString() + line);
         });
 
         button2.addActionListener(e -> {
+            outputTextArea.setText("");
             try {
                 System.setErr(new PrintStream("error.log"));
             } catch (FileNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
+            String line = "------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+            String h2 = line+"\t\t\tSYMBOL TABLE\n"+line+"   Attribute Value\t\tToken Name\t\tType\t\tValue\n"+line;
+            String h1 = line+"\t\t\tTOKENS\n"+line+"      Lexeme\t\tToken Name\t\tAttribute Value\t\tLine Number\n"+line;
             String s = inputTextArea.getText();
             SyntaxAnalyzer sa = new SyntaxAnalyzer(s);
+            sa.la.tokens.remove(sa.EOF_TOKEN);
+            sa.la.symbolTable.remove(sa.EOF_TOKEN);
+            Formatter f1 = sa.la.printLexTable();
+            Formatter f2 = sa.la.printTable();
+            String show = h1 + f1.toString() + line + h2 + f2.toString() + line;
             boolean f = sa.recognizeSyntax();
             if (f)
-                outputTextArea.setText("Compiled Successfully!");
+                outputTextArea.setText(show + "\nCompiled Successfully!");
             else{
-                 outputTextArea.setText(sa.error + "\nCompilation failed!");
+                 outputTextArea.setText(show + sa.error + "\nCompilation failed!");
             }
         });
 

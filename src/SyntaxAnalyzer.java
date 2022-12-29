@@ -4,6 +4,7 @@ import java.util.Stack;
 
 class SyntaxAnalyzer{
     ArrayList<Token> tokenList;
+    LexicalAnalyzer la;
     int i = 0;
     Stack<String> parseTree = new Stack<>();
     String str;
@@ -26,7 +27,7 @@ class SyntaxAnalyzer{
     Token EOF_TOKEN = new Token("-", "$", "EOF", "$", "-", Integer.MAX_VALUE);
 
     public SyntaxAnalyzer(String sourceCode) {
-        LexicalAnalyzer la = new LexicalAnalyzer(sourceCode);
+        la = new LexicalAnalyzer(sourceCode);
         tokenList = la.tokens;
         tokenList.add(EOF_TOKEN);
         parseTree.push("0");
@@ -37,19 +38,15 @@ class SyntaxAnalyzer{
         while (true){
             String s = check(parseTree.peek(), str);
             if (Objects.equals(s, "NULL")){
-                error = "Provided code is not part of the grammar.";
+                error = "Provided expression is not part of the grammar.\nError Occurred due to: " + str + "\nCannot parse remaining expression.";
                 return false;
             }
             if (Objects.equals(s, "")) {
-                error = "Error found at line " + tokenList.get(i - 1).lineNumber;
+                error = "Error found at line " + tokenList.get(i - 1).lineNumber + "\nError Occurred due to: " + str + "\nCannot parse remaining expression";
                 return false;
             }
             String findResultOp = String.valueOf(s.charAt(0));
             String findResultID = s.substring(1);
-
-            if (s.equals("NULL")) {
-                return false;
-            }
 
             if (findResultOp.equals("s")){
                 shift(findResultID, String.valueOf(tokenList.get(i).lexeme));
