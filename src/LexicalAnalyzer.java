@@ -5,12 +5,12 @@ import java.util.Objects;
 
 public class LexicalAnalyzer {
 
-    int startAttribute = 0;
-    char character;
-    int lineNumber = 1;
-    boolean flag = true;
+    private int startAttribute = 0;
+    public char character;
+    private int lineNumber = 1;
+    private boolean flag = true;
 
-    BufferedReader reader;
+    private final BufferedReader reader;
     public final ArrayList<Token> tokens = new ArrayList<>();
     public final ArrayList<Token> symbolTable = new ArrayList<>();
     public final  ArrayList<Errors> errorsList = new ArrayList<>();
@@ -57,7 +57,7 @@ public class LexicalAnalyzer {
         return fmt;
     }
 
-    public void generateTokens() {
+    private void generateTokens() {
         Token token = readNextToken();
         while (token != null) {
             if (Objects.equals(token.tokenName, "ID") || Objects.equals(token.tokenName, "IV") || Objects.equals(token.tokenName, "SL")) {
@@ -108,7 +108,7 @@ public class LexicalAnalyzer {
         return true;
     }
 
-    public Token readNextToken() {
+    private Token readNextToken() {
         int state = 0;
         while (true) {
             if (character == (char) -1) {
@@ -642,7 +642,7 @@ public class LexicalAnalyzer {
         return (char) -1;
     }
 
-    public Token checkIdentifiers(String s, String newS) {
+    private Token checkIdentifiers(String s, String newS) {
         StringBuilder word = new StringBuilder(s);
         if (newS.equals(String.valueOf(' '))){
             if (checkTokenName(String.valueOf(word))) {
@@ -679,7 +679,7 @@ public class LexicalAnalyzer {
         return null;
     }
 
-    boolean checkRelopAndArtop(char c){
+    private boolean checkRelopAndArtop(char c){
         if (c == '+' || c == '-' || c == '/' || c == '*' || c == '(' || c == ')' || c == '{' || c == '}'){
             return true;
         }
@@ -706,14 +706,13 @@ public class LexicalAnalyzer {
         return false;
     }
 
-    boolean isDigit(char c) {
+    private boolean isDigit(char c) {
         return c >= '0' && c <= '9';
     }
 
-    boolean isAlphabet(char c) {
+    private boolean isAlphabet(char c) {
         if (c >= 'a' && c <= 'z')
             return true;
         return c >= 'A' && c <= 'Z';
     }
-
 }

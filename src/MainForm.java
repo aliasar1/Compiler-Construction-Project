@@ -6,21 +6,17 @@ import java.util.Formatter;
 
 public class MainForm extends JFrame {
     public void createGUI() {
-        // Set the frame properties
-        // Get the available screen bounds, which will exclude the taskbar
+
         Rectangle screenBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-        // Set the minimum size of the frame to the available screen bounds
         setMinimumSize(new Dimension(screenBounds.width, screenBounds.height));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         pack();
         setTitle("Compiler Construction");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        // Create a panel to hold the scroll panes and labels
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        // Create the first label and scroll pane
         JLabel label1 = new JLabel("INPUT CODE");
         label1.setAlignmentX(Component.CENTER_ALIGNMENT);
         JTextArea inputTextArea = new JTextArea();
@@ -30,13 +26,11 @@ public class MainForm extends JFrame {
         inputScrollPane.setViewportView(inputTextArea);
         inputScrollPane.setPreferredSize(new Dimension(100, 100));
 
-        // Add the label and scroll pane to the panel
         panel.add(label1);
         panel.add(inputScrollPane);
 
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Create the second label and scroll pane
         JLabel label2 = new JLabel("OUTPUT RESULT");
         label2.setAlignmentX(Component.CENTER_ALIGNMENT);
         label2.add(Box.createRigidArea(new Dimension(10, 40)));
@@ -50,35 +44,27 @@ public class MainForm extends JFrame {
         outputScrollPane.setViewportView(outputTextArea);
         outputScrollPane.setPreferredSize(new Dimension(100, 100));
 
-        // Create a panel to hold the buttons in a horizontal line
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-
-        // Create the buttons
         JButton button1 = new JButton("Lexical Analyzer");
         JButton button2 = new JButton("Syntax Analyzer");
         JButton button3 = new JButton("Exit");
         button1.add(Box.createRigidArea(new Dimension(200, 20)));
         button2.add(Box.createRigidArea(new Dimension(200, 20)));
         button3.add(Box.createRigidArea(new Dimension(50, 20)));
-        // Add the buttons to the button panel
         buttonPanel.add(button1);
         buttonPanel.add(button2);
         buttonPanel.add(button3);
 
-        // Add the button panel to the main panel
         panel.add(buttonPanel);
 
-        // Add the label and scroll pane to the panel
         panel.add(label2);
         panel.add(outputScrollPane);
 
-        // Add the panel to the frame
         add(panel);
 
-        // Display the frame
         setVisible(true);
 
         button1.addActionListener(e -> {

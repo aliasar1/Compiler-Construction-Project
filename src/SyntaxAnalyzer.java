@@ -3,14 +3,14 @@ import java.util.Objects;
 import java.util.Stack;
 
 class SyntaxAnalyzer{
-    ArrayList<Token> tokenList;
-    LexicalAnalyzer la;
-    int i = 0;
-    Stack<String> parseTree = new Stack<>();
-    String str;
+    private final ArrayList<Token> tokenList;
+    public LexicalAnalyzer la;
+    private int i = 0;
+    private final Stack<String> parseTree = new Stack<>();
+    private String str;
     public String error;
-    String[] productionRules = {"E -> E + T", "E -> T", "T -> T * F", "T -> F", "F -> ( E )", "F -> id"};
-    public String[][] slrTable = {
+    private final String[] productionRules = {"E -> E + T", "E -> T", "T -> T * F", "T -> F", "F -> ( E )", "F -> id"};
+    private final String[][] slrTable = {
             {"s5", "", "", "s4", "", "", "1", "2", "3"},
             {"", "s6", "", "", "", "accept", "", "", ""},
             {"", "r2", "s7", "", "r2", "r2", "", "", ""},
@@ -24,7 +24,7 @@ class SyntaxAnalyzer{
             {"", "r3", "r3", "", "r3", "r3", "", "", ""},
             {"", "r5", "r5", "", "r5", "r5", "", "", ""}
     };
-    Token EOF_TOKEN = new Token("-", "$", "EOF", "$", "-", Integer.MAX_VALUE);
+    public Token EOF_TOKEN = new Token("-", "$", "EOF", "$", "-", Integer.MAX_VALUE);
 
     public SyntaxAnalyzer(String sourceCode) {
         la = new LexicalAnalyzer(sourceCode);
