@@ -769,28 +769,26 @@ public class LexicalAnalyzer {
         }
         while (true) {
             character = readNextCharacter();
-            char c = 0;
-            boolean invalid = false;
-            if (!newS.equals("")){
-                invalid = true;
-                c = newS.charAt(0);
-            }
-            if (invalid){
-                if (character == ';'){
-                    errorsList.add(new Errors(lineNumber, "Invalid Identifier", "Message: Invalid Identifier Found.", String.valueOf(word)));
-                    flag = true;
-                    return null;
-                }
-                if (!isAlphabet(c) && !isDigit(c)){
-                    word.append(character);
-                    while (true){
-                        character = readNextCharacter();
-                        if (character == ' ' || character == '\n' || character == ';' || character == '=' || character == ')'|| character == (char) -1){
-                            errorsList.add(new Errors(lineNumber, "Invalid Identifier", "Message: Invalid Identifier Found.", String.valueOf(word)));
-                            flag = true;
-                            return null;
-                        }
+            if (!newS.isEmpty()){
+                if (!isAlphabet(newS.charAt(0)) && !isDigit(newS.charAt(0))){
+                    char c;
+                    c = newS.charAt(0);
+                    if (character == ';'){
+                        errorsList.add(new Errors(lineNumber, "Invalid Identifier", "Message: Invalid Identifier Found.", String.valueOf(word)));
+                        flag = true;
+                        return null;
+                    }
+                    if (!isAlphabet(c) && !isDigit(c)){
                         word.append(character);
+                        while (true){
+                            character = readNextCharacter();
+                            if (character == ' ' || character == '\n' || character == ';' || character == '=' || character == ')'|| character == (char) -1){
+                                errorsList.add(new Errors(lineNumber, "Invalid Identifier", "Message: Invalid Identifier Found.", String.valueOf(word)));
+                                flag = true;
+                                return null;
+                            }
+                            word.append(character);
+                        }
                     }
                 }
             }
