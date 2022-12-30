@@ -59,6 +59,9 @@ public class LexicalAnalyzer {
 
     private void generateTokens() {
         Token token = readNextToken();
+        if (token == null && flag){
+            token = readNextToken();
+        }
         while (token != null) {
             if (Objects.equals(token.tokenName, "ID") || Objects.equals(token.tokenName, "IV") || Objects.equals(token.tokenName, "SL")) {
                 if (checkTokenName(token.tokenName) || checkValue(token.value)) {
@@ -269,6 +272,10 @@ public class LexicalAnalyzer {
                             }
                             else {
                                 character = readNextCharacter();
+                            }
+                            if (character == '\uFFFF'){
+                                errorsList.add(new Errors(lineNumber, "Multiline Comment", "Message: Multiline comment is not closed.", "Multiline comment"));
+                                return null;
                             }
                             if (character == '\n')
                                 lineNumber++;
@@ -645,6 +652,11 @@ public class LexicalAnalyzer {
     private Token checkIdentifiers(String s, String newS) {
         StringBuilder word = new StringBuilder(s);
         if (newS.equals(String.valueOf(' '))){
+            if (checkTokenName(String.valueOf(word))) {
+                return new Token(String.valueOf(startAttribute),String.valueOf(word), "ID", String.valueOf(word), "-", lineNumber);
+            }
+        }
+        else if (newS.equals(String.valueOf('\n'))){
             if (checkTokenName(String.valueOf(word))) {
                 return new Token(String.valueOf(startAttribute),String.valueOf(word), "ID", String.valueOf(word), "-", lineNumber);
             }

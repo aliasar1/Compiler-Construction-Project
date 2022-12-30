@@ -41,6 +41,9 @@ class SyntaxAnalyzer{
             if (Objects.equals(type, "Invalid Identifier")){
                 error = "Error found at line " + la.errorsList.get(0).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to invalid identifier found: " + invalid + "\nCannot parse remaining expression.";
             }
+            else if (Objects.equals(type, "Multiline Comment")){
+                error = "Error found at line " + la.errorsList.get(0).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to unclosed multiline comment found." + "\nCannot parse remaining expression.";
+            }
             else
                 error = "Error found at line " + la.errorsList.get(0).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to invalid lexeme found: " + invalid + "\nCannot parse remaining expression.";
             return false;
@@ -51,7 +54,12 @@ class SyntaxAnalyzer{
                 if (Objects.equals(str, String.valueOf('$'))){
                     str = tokenList.get(i-1).lexeme;
                 }
-                error = "Error found at line " + tokenList.get(i - 1).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to: " + str + "\nCannot parse remaining expression.";
+                int index = getIndex(str);
+                if (tokenList.size() <= 2){
+                    error = "Error found at line " + tokenList.get(index).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to: " + str + "\nCannot parse remaining expression.";
+                }
+                else
+                    error = "Error found at line " + tokenList.get(index).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to: " + str + "\nCannot parse remaining expression.";
                 return false;
             }
             String findResultOp = String.valueOf(s.charAt(0));
@@ -67,6 +75,15 @@ class SyntaxAnalyzer{
             }
             else return findResultOp.equals("a");
         }
+    }
+
+    private int getIndex(String s){
+        for (int i=0; i<tokenList.size(); i++) {
+            if (Objects.equals(tokenList.get(i).lexeme, s)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private boolean isIdentifier(String s){

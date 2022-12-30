@@ -88,7 +88,11 @@ public class MainForm extends JFrame {
                 String output = h1 + f1.toString() + line;
                 Formatter f2 = lx.printTable();
                 Formatter f3 = lx.errorTable();
-                outputTextArea.setText(output + h2 + f2.toString() + line + h3 + f3.toString() + line);
+                if (lx.errorsList.isEmpty()){
+                    outputTextArea.setText(output + h2 + f2.toString() + line);
+                }else {
+                    outputTextArea.setText(output + h2 + f2.toString() + line + h3 + f3.toString() + line);
+                }
             }
         });
 
