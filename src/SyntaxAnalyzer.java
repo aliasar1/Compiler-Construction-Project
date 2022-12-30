@@ -39,13 +39,13 @@ class SyntaxAnalyzer{
             String invalid = la.errorsList.get(0).lexeme;
             String type = la.errorsList.get(0).errorType;
             if (Objects.equals(type, "Invalid Identifier")){
-                error = "Error found at line " + la.errorsList.get(0).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to invalid identifier found: " + invalid + "\nCannot parse remaining expression.";
+                error = "Error found at line " + la.errorsList.get(0).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to invalid identifier found: " + invalid + "\nCannot parse expression.";
             }
             else if (Objects.equals(type, "Multiline Comment")){
-                error = "Error found at line " + la.errorsList.get(0).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to unclosed multiline comment found." + "\nCannot parse remaining expression.";
+                error = "Error found at line " + la.errorsList.get(0).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to unclosed multiline comment found." + "\nCannot parse expression.";
             }
             else
-                error = "Error found at line " + la.errorsList.get(0).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to invalid lexeme found: " + invalid + "\nCannot parse remaining expression.";
+                error = "Error found at line " + la.errorsList.get(0).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to invalid lexeme found: " + invalid + "\nCannot parse expression.";
             return false;
         }
         while (true){
@@ -55,11 +55,7 @@ class SyntaxAnalyzer{
                     str = tokenList.get(i-1).lexeme;
                 }
                 int index = getIndex(str);
-                if (tokenList.size() <= 2){
-                    error = "Error found at line " + tokenList.get(index).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to: " + str + "\nCannot parse remaining expression.";
-                }
-                else
-                    error = "Error found at line " + tokenList.get(index).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to: " + str + "\nCannot parse remaining expression.";
+                error = "Error found at line " + tokenList.get(index).lineNumber + "\nProvided expression is not part of the grammar.\nError Occurred due to: " + str + "\nCannot parse expression.";
                 return false;
             }
             String findResultOp = String.valueOf(s.charAt(0));

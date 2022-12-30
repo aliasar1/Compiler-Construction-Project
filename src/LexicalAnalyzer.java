@@ -53,7 +53,6 @@ public class LexicalAnalyzer {
         for (Errors error : errorsList) {
             fmt.format("%14s  %50s  %60s  %40s\n", error.lexeme, error.errorType, error.errorMessage, " on line " + error.lineNumber);
         }
-        System.out.println(fmt);
         return fmt;
     }
 
@@ -113,6 +112,7 @@ public class LexicalAnalyzer {
 
     private Token readNextToken() {
         int state = 0;
+        boolean lineFlag = false;
         while (true) {
             if (character == (char) -1) {
                 try {
@@ -126,6 +126,14 @@ public class LexicalAnalyzer {
             if (character == '\n') {
                 character = readNextCharacter();
                 lineNumber++;
+                while (true){
+                    if (character == '\n'){
+                        character = readNextCharacter();
+                        lineNumber++;
+                    }
+                    else
+                        break;
+                }
                 if (character == '\uFFFF'){
                     try {
                         reader.close();
@@ -335,13 +343,22 @@ public class LexicalAnalyzer {
                     }
                     if (character == ' ') {
                         state = 23;
-                    } else {
+                    }
+                    else if (character == '\n'){
+                        character = readNextCharacter();
+                        lineFlag = true;
+                        state = 23;
+                    }
+                    else {
                         state = 24;
                     }
                 }
                 case 23 -> {
-                    character = readNextCharacter();
-                    return new Token(String.valueOf(startAttribute),"int" ,"INT", "-", "-", lineNumber);
+                    if (lineFlag){
+                        return new Token(String.valueOf(startAttribute),"int" ,"INT", "-", "-", lineNumber++);
+                    }
+                    else
+                        return new Token(String.valueOf(startAttribute),"int" ,"INT", "-", "-", lineNumber);
                 }
                 case 24 -> {
                     return checkIdentifiers("int",String.valueOf(character));
@@ -377,13 +394,21 @@ public class LexicalAnalyzer {
                     }
                     if (character == ' ') {
                         state = 29;
-                    } else {
+                    }
+                    else if (character == '\n'){
+                        character = readNextCharacter();
+                        lineFlag = true;
+                        state = 29;
+                    }
+                    else {
                         state = 30;
                     }
                 }
                 case 29 -> {
-                    character = readNextCharacter();
-                    return new Token(String.valueOf(startAttribute), "char","CHAR", "-", "", lineNumber);
+                    if (lineFlag)
+                        return new Token(String.valueOf(startAttribute), "char","CHAR", "-", "", lineNumber++);
+                    else
+                        return new Token(String.valueOf(startAttribute), "char","CHAR", "-", "", lineNumber);
                 }
                 case 30 -> {
                     character = readNextCharacter();
@@ -433,13 +458,21 @@ public class LexicalAnalyzer {
                         return new Token(String.valueOf(startAttribute),"string","STRING", "-", "", lineNumber);
                     if (character == ' ') {
                         state = 37;
-                    } else {
+                    }
+                    else if (character == '\n'){
+                        character = readNextCharacter();
+                        lineFlag = true;
+                        state = 37;
+                    }
+                    else {
                         state = 38;
                     }
                 }
                 case 37 -> {
-                    character = readNextCharacter();
-                    return new Token(String.valueOf(startAttribute),"string","STRING", "-", "", lineNumber);
+                    if (lineFlag)
+                        return new Token(String.valueOf(startAttribute),"string","STRING", "-", "", lineNumber++);
+                    else
+                        return new Token(String.valueOf(startAttribute),"string","STRING", "-", "", lineNumber);
                 }
                 case 38 -> {
                     return checkIdentifiers("string",String.valueOf(character));
@@ -450,12 +483,20 @@ public class LexicalAnalyzer {
                         return new Token(String.valueOf(startAttribute), "if","IF", "-", "-", lineNumber);
                     if (character == ' ') {
                         state = 40;
-                    } else
+                    }
+                    else if (character == '\n'){
+                        character = readNextCharacter();
+                        lineFlag = true;
+                        state = 40;
+                    }
+                    else
                         state = 41;
                 }
                 case 40 -> {
-                    character = readNextCharacter();
-                    return new Token(String.valueOf(startAttribute), "if","IF", "-", "-", lineNumber);
+                    if (lineFlag)
+                        return new Token(String.valueOf(startAttribute), "if","IF", "-", "-", lineNumber++);
+                    else
+                        return new Token(String.valueOf(startAttribute), "if","IF", "-", "-", lineNumber);
                 }
                 case 41 -> {
                     return checkIdentifiers("if",String.valueOf(character));
@@ -487,12 +528,19 @@ public class LexicalAnalyzer {
                         return new Token(String.valueOf(startAttribute), "else", "ELSE", "-", "", lineNumber);
                     if (character == ' ')
                         state = 46;
+                    else if (character == '\n'){
+                        character = readNextCharacter();
+                        lineFlag = true;
+                        state = 46;
+                    }
                     else
                         state = 47;
                 }
                 case 46 -> {
-                    character = readNextCharacter();
-                    return new Token(String.valueOf(startAttribute), "else", "ELSE", "-", "", lineNumber);
+                    if (lineFlag)
+                        return new Token(String.valueOf(startAttribute), "else", "ELSE", "-", "", lineNumber++);
+                    else
+                        return new Token(String.valueOf(startAttribute), "else", "ELSE", "-", "", lineNumber);
                 }
                 case 47 -> {
                     return checkIdentifiers("else",String.valueOf(character));
@@ -511,13 +559,21 @@ public class LexicalAnalyzer {
                         return new Token(String.valueOf(startAttribute), "do","DO", "", "", lineNumber);
                     if (character == ' ') {
                         state = 50;
-                    } else {
+                    }
+                    else if (character == '\n'){
+                        character = readNextCharacter();
+                        lineFlag = true;
+                        state = 50;
+                    }
+                    else {
                         state = 51;
                     }
                 }
                 case 50 -> {
-                    character = readNextCharacter();
-                    return new Token(String.valueOf(startAttribute), "do","DO", "", "", lineNumber);
+                    if (lineFlag)
+                        return new Token(String.valueOf(startAttribute), "do","DO", "", "", lineNumber++);
+                    else
+                        return new Token(String.valueOf(startAttribute), "do","DO", "", "", lineNumber);
                 }
                 case 51 -> {
                     return checkIdentifiers("do",String.valueOf(character));
@@ -560,13 +616,21 @@ public class LexicalAnalyzer {
                         return new Token(String.valueOf(startAttribute), "while","WHILE", "-", "-", lineNumber);
                     if (character == ' ') {
                         state = 57;
-                    } else {
+                    }
+                    else if (character == '\n'){
+                        character = readNextCharacter();
+                        lineFlag = true;
+                        state = 57;
+                    }
+                    else {
                         state = 58;
                     }
                 }
                 case 57 -> {
-                    character = readNextCharacter();
-                    return new Token(String.valueOf(startAttribute), "while","WHILE", "-", "-", lineNumber);
+                    if (lineFlag)
+                        return new Token(String.valueOf(startAttribute), "while","WHILE", "-", "-", lineNumber++);
+                    else
+                        return new Token(String.valueOf(startAttribute), "while","WHILE", "-", "-", lineNumber);
                 }
                 case 58 -> {
                     return checkIdentifiers("while",String.valueOf(character));
